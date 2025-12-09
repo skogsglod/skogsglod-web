@@ -24,16 +24,24 @@
             justify-content: center; align-items: center;
             text-align: center; padding: 20px; box-sizing: border-box;
         }
-        .container { max-width: 700px; animation: fadeIn 1.5s ease-in; }
+        
+        /* Ökad bredd till 900px så din breda logga får plats bekvämt */
+        .container { max-width: 900px; width: 100%; animation: fadeIn 1.5s ease-in; }
+        
         .logo { 
-            max-width: 350px; width: 100%; height: auto; margin-bottom: 20px; 
+            max-width: 762px; /* Din orginalbredd */
+            width: 100%; /* Anpassar sig på mindre skärmar */
+            height: auto; 
+            margin-bottom: 70px; /* ÖKAT AVSTÅND HÄR (Var 20px) */
         }
+        
         h2 {
             font-size: 1.2rem; letter-spacing: 3px; text-transform: uppercase;
             font-weight: 300; color: #d4af37; margin-top: 0; margin-bottom: 30px;
         }
         p {
             font-size: 1.1rem; line-height: 1.6; color: #ccc; margin-bottom: 40px;
+            max-width: 700px; margin-left: auto; margin-right: auto; /* Håller texten centrerad och snygg */
         }
         .btn {
             display: inline-block; padding: 15px 35px;
@@ -43,10 +51,19 @@
         }
         .btn:hover { background-color: #d4af37; color: #000; }
         .footer {
-            margin-top: 60px; font-size: 0.75rem; color: #777;
+            margin-top: 80px; font-size: 0.75rem; color: #777;
             border-top: 1px solid #444; padding-top: 20px;
+            max-width: 500px; margin-left: auto; margin-right: auto;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Mobilanpassning */
+        @media (max-width: 600px) {
+            /* På mobil får loggan ta upp nästan hela bredden */
+            .logo { max-width: 90%; margin-bottom: 40px; } 
+            h2 { font-size: 0.9rem; margin-bottom: 20px;}
+            p { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
