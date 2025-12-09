@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skogsglöd AB</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0b0b0b; color: #f0f0f0;
+        }
+        .bg-image {
+            /* Hämtar din bakgrundsbild från samma mapp */
+            background-image: url('background.jpg'); 
+            height: 100%; background-position: center;
+            background-repeat: no-repeat; background-size: cover;
+            position: relative;
+        }
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Mörkt filter över bilden */
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px; box-sizing: border-box;
+        }
+        .container { max-width: 700px; animation: fadeIn 1.5s ease-in; }
+        .logo { 
+            max-width: 350px; width: 100%; height: auto; margin-bottom: 20px; 
+        }
+        h2 {
+            font-size: 1.2rem; letter-spacing: 3px; text-transform: uppercase;
+            font-weight: 300; color: #d4af37; margin-top: 0; margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.1rem; line-height: 1.6; color: #ccc; margin-bottom: 40px;
+        }
+        .btn {
+            display: inline-block; padding: 15px 35px;
+            border: 1px solid #d4af37; color: #d4af37;
+            text-decoration: none; text-transform: uppercase;
+            font-size: 0.9rem; letter-spacing: 2px; transition: all 0.3s ease;
+        }
+        .btn:hover { background-color: #d4af37; color: #000; }
+        .footer {
+            margin-top: 60px; font-size: 0.75rem; color: #777;
+            border-top: 1px solid #444; padding-top: 20px;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="bg-image">
+        <div class="overlay">
+            <div class="container">
+                <img src="Logo_Ochra.png" alt="Skogsglöd AB" class="logo">
+                
+                <h2>Technical Product Development</h2>
+                
+                <p>
+                    Helhetslösningar inom design och produktutveckling för tekniska funktionskläder.<br>
+                    Från idé till färdig produkt.
+                </p>
+                
+                <a href="mailto:alex@skogsglod.se" class="btn">Kontakta Oss</a>
+                
+                <div class="footer">
+                    &copy; 2025 Skogsglöd AB &bull; Hammerdal, Jämtland<br>
+                    Proud partner of Mountain Grit Corp.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
