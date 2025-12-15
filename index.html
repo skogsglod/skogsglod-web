@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skogsglöd AB</title>
+    <link rel="icon" type="image/png" href="Symbol.png">
+    
     <style>
         body, html {
             margin: 0; padding: 0; height: 100%;
@@ -18,7 +20,7 @@
         }
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.65); /* Lite mörkare för bättre kontrast */
+            background: rgba(0, 0, 0, 0.65);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             text-align: center; padding: 20px; box-sizing: border-box;
@@ -27,7 +29,7 @@
         .container { max-width: 900px; width: 100%; animation: fadeIn 1.5s ease-in; }
         
         .logo { 
-            max-width: 600px; /* NY STORLEK: Mer balanserad */
+            max-width: 600px; 
             width: 100%; 
             height: auto; 
             margin-bottom: 70px; 
@@ -55,19 +57,17 @@
             max-width: 500px; margin-left: auto; margin-right: auto;
         }
         
-        /* Snygg länkstil för partnern */
         .partner-link {
             color: #999; text-decoration: none; transition: color 0.3s ease;
-            border-bottom: 1px dotted #555; /* Diskret understrykning */
+            border-bottom: 1px dotted #555; 
         }
         .partner-link:hover {
-            color: #d4af37; /* Blir guld vid hover */
+            color: #d4af37; 
             border-bottom: 1px solid #d4af37;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Mobilanpassning */
         @media (max-width: 600px) {
             .logo { max-width: 90%; margin-bottom: 40px; } 
             h2 { font-size: 0.9rem; margin-bottom: 20px;}
@@ -84,8 +84,8 @@
                 <h2>Technical Product Development</h2>
                 
                 <p>
-                    Helhetslösningar inom design och produktutveckling för tekniska funktionskläder.<br>
-                    Från idé till färdig produkt.
+                    Extern produktavdelning för design och utveckling av funktionskläder.<br>
+                    Vi realiserar visioner.
                 </p>
                 
                 <a href="mailto:alex@skogsglod.se" class="btn">Kontakta Oss</a>
