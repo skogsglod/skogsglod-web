@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mixed Filer</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+    h1 { font-size: 1.5rem; margin-bottom: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 10px; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Filer</h1>
+  <ul id="file-list">Laddar filer...</ul>
+
+  <script>
+    // Byt ut användarnamn om repot ligger under en organisation/annat konto
+    const user = 'ditt-github-anvandarnamn';
+    const repo = 'skogsglod-web';
+    const folder = 'mixed';
+
+    fetch(`https://api.github.com/repos/${user}/${repo}/contents/${folder}`)
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('file-list');
+        list.innerHTML = '';
+
+        const files = data.filter(item => item.name !== 'index.html' && item.type === 'file');
+
+        if (files.length === 0) {
+          list.innerHTML = '<li>Inga andra filer hittades i mappen.</li>';
+          return;
+        }
+
+        files.forEach(file => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = file.name;
+          // Snyggar till namnet genom att ta bort .html och ersätta understreck med mellanslag
+          a.textContent = file.name.replace('.html', '').replace(/_/g, ' ');
+          li.appendChild(a);
+          list.appendChild(li);
+        });
+      })
+      .catch(err => {
+        document.getElementById('file-list').innerHTML = '<li>Kunde inte hämta filer automatiskt.</li>';
+      });
+  </script>
+</body>
+</html>
