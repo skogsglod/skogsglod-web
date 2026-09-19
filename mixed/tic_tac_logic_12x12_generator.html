@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Logic 12×12 – A4 Generator & Utskrift</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter och JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --board-size-4print: 90mm; /* Fyller 4 per A4 perfekt */
+      --cell-size-4print: calc(var(--board-size-4print) / 12);
+      --font-size-4print: calc(var(--cell-size-4print) * 0.70);
+    }
+
+    .font-symbol {
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+
+    /* ==========================================================================
+       UTSKRIFTSLAYOUT FÖR A4 (Maximerat utnyttjande utan inre tjocka linjer)
+       ========================================================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 6mm 7mm 6mm 7mm; /* Minimerade marginaler för maximal brädstorlek */
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Strikt A4-ark med ren sidbrytning */
+      .a4-page {
+        height: 284mm !important;
+        max-height: 284mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+
+      .a4-page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      /* 2x2 rutnät för 4 pussel per A4 */
+      .print-grid-4 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(2, 1fr) !important;
+        gap: 6mm 8mm !important;
+        height: 268mm !important;
+        align-items: center !important;
+        justify-items: center !important;
+        padding: 1mm 0 !important;
+      }
+
+      .print-board-card-4 {
+        width: var(--board-size-4print) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+
+      /* Yttre ram är fet (2.5px solid #000) */
+      .print-board-grid-4 {
+        width: var(--board-size-4print) !important;
+        height: var(--board-size-4print) !important;
+        display: grid !important;
+        grid-template-columns: repeat(12, 1fr) !important;
+        grid-template-rows: repeat(12, 1fr) !important;
+        border: 2.5px solid #000000 !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Inre rutlinjer: Helt jämna och tunna (1px solid #71717a) */
+      .print-board-grid-4 .cell {
+        width: 100% !important;
+        height: 100% !important;
+        font-size: var(--font-size-4print) !important;
+        line-height: 1 !important;
+        color: #000000 !important;
+        border-right: 1px solid #71717a !important;
+        border-bottom: 1px solid #71717a !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Ta bort dubbelkant på yttersta höger- och nederkant */
+      .print-board-grid-4 .cell-right-edge {
+        border-right: none !important;
+      }
+      .print-board-grid-4 .cell-bottom-edge {
+        border-bottom: none !important;
+      }
+
+      /* Schackbrädemönster för utskrift */
+      .cell-light {
+        background-color: #ffffff !important;
+      }
+      .cell-dark {
+        background-color: #e9eef4 !important;
+      }
+
+      /* Förtryckta ledtrådar: Feta och skarpt svarta utan att störa schackmönstret */
+      .print-cell-initial {
+        font-weight: 900 !important;
+        color: #000000 !important;
+      }
+
+      .print-cell-user {
+        color: #1e3a8a !important;
+        font-weight: 700 !important;
+      }
+    }
+
+    /* Schackbrädemönster på skärmen */
+    .cell-light {
+      background-color: #ffffff;
+    }
+    .cell-dark {
+      background-color: #f1f5f9;
+    }
+
+    /* Skärmvisning av ark */
+    @media screen {
+      .a4-page {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2.5rem;
+        padding: 1.5rem;
+        min-height: 297mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .print-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem 1.75rem;
+        align-items: start;
+        justify-items: center;
+        padding: 0.75rem 0;
+      }
+
+      @media (max-width: 860px) {
+        .print-grid-4 {
+          grid-template-columns: 1fr;
+        }
+        .a4-page {
+          min-height: auto;
+        }
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+  <!-- Huvudverktygsfält (döljs vid utskrift) -->
+  <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logotyp och titel -->
+      <div class="flex items-center gap-3">
+        <div class="bg-indigo-600 text-white p-2 rounded-xl font-mono font-extrabold text-lg flex items-center justify-center w-10 h-10 shadow-sm">
+          XO
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            Tic-Tac-Logic 12×12
+            <span id="header-diff-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200">
+              Lätt nivå
+            </span>
+          </h1>
+          <p class="text-xs text-slate-500">Optimerad för 4 pussel per A4 • Rena, jämna rutnät</p>
+        </div>
+      </div>
+
+      <!-- Primära knappar -->
+      <div class="flex items-center gap-2">
+        <button id="btn-generate" onclick="generateAllPuzzles()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Generera nya
+        </button>
+
+        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Skriv ut (A4)
+        </button>
+
+        <button onclick="toggleRulesModal(true)" class="inline-flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-lg border border-slate-300 transition cursor-pointer">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Regler
+        </button>
+      </div>
+    </div>
+
+    <!-- Sekundärt inställningsfält -->
+    <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-2.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-medium text-slate-600">
+        
+        <!-- Vänstergrupp: Svårighetsgrad och antal -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-5">
+          
+          <!-- Svårighetsgradsväljare -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500 font-semibold">Svårighetsgrad:</span>
+            <div class="inline-flex p-0.5 bg-slate-200 rounded-lg border border-slate-300">
+              <button id="diff-easy" onclick="setDifficulty('easy')" class="px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-emerald-700 shadow-xs cursor-pointer">
+                Lätt
+              </button>
+              <button id="diff-medium" onclick="setDifficulty('medium')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-900 cursor-pointer">
+                Medel
+              </button>
+              <button id="diff-hard" onclick="setDifficulty('hard')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-900 cursor-pointer">
+                Svår
+              </button>
+            </div>
+          </div>
+
+          <!-- Antal pussel (A4-ark) -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500">Antal pussel:</span>
+            <select id="count-select" onchange="changeCount(parseInt(this.value))" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="4" selected>4 st (1 A4-ark)</option>
+              <option value="8">8 st (2 A4-ark)</option>
+              <option value="12">12 st (3 A4-ark)</option>
+            </select>
+          </div>
+
+          <!-- Rutor i print storlek -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500">Utskriftsstorlek:</span>
+            <select id="size-select" onchange="changePrintBoardSize(this.value)" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="86mm">Kompakt (86 mm)</option>
+              <option value="90mm" selected>Standard (90 mm - Fyller sidan)</option>
+              <option value="93mm">Maximal (93 mm)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Högergrupp: Kryssrutor -->
+        <div class="flex flex-wrap items-center gap-4">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="check-solutions" checked onchange="toggleIncludeSolutions(this.checked)" class="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 cursor-pointer">
+            <span>Inkludera facitsida</span>
+          </label>
+
+          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="check-rules-strip" checked onchange="toggleRulesStrip(this.checked)" class="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 cursor-pointer">
+            <span>Visa regelrad på arken</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-5 print:p-0 print:max-w-none">
+    
+    <!-- Skärmbanner med snabbhjälp -->
+    <div class="no-print mb-5 p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs sm:text-sm">
+      <div class="flex items-start gap-3">
+        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0 mt-0.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <p class="font-semibold text-slate-900">Spela direkt på skärmen eller skriv ut arken</p>
+            <span id="diff-description-pill" class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Lätt nivå (~52–58 ledtrådar, 100% direkt lösbart)
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">
+            <strong>Vänsterklick:</strong> Tom &rarr; X &rarr; O &rarr; Tom. <strong>Högerklick:</strong> Direkt O. Tangentbord: <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded text-[10px] font-mono">Piltangenter</kbd> + <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded text-[10px] font-mono">X</kbd>, <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded text-[10px] font-mono">O</kbd>, <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded text-[10px] font-mono">Backsteg</kbd>.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 self-end md:self-auto">
+        <button onclick="checkAllPuzzles()" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 rounded-lg border border-slate-300 transition cursor-pointer">
+          Kontrollera svar
+        </button>
+        <button onclick="resetAllUserInput()" class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 transition cursor-pointer">
+          Rensa mina drag
+        </button>
+      </div>
+    </div>
+
+    <!-- Huvudbehållare för alla A4-ark -->
+    <div id="pages-container" class="print-container"></div>
+  </main>
+
+  <!-- Modal: Regler och instruktioner -->
+  <div id="rules-modal" class="no-print fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="text-indigo-600 font-mono font-bold text-lg">XO</span>
+          <h3 class="text-lg font-bold text-slate-900">Tic-Tac-Logic Spelregler</h3>
+        </div>
+        <button onclick="toggleRulesModal(false)" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      
+      <div class="py-4 space-y-3.5 text-xs sm:text-sm text-slate-600">
+        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <div>
+            <strong class="text-slate-900 block">Exakt 6 X och 6 O</strong>
+            Varje rad och varje kolumn ska innehålla exakt sex kryss (X) och sex cirklar (O).
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
+          <div>
+            <strong class="text-slate-900 block">Max två likadana i rad</strong>
+            Det får aldrig finnas tre likadana symboler intill varandra (aldrig <code class="bg-slate-200 px-1 py-0.5 rounded font-mono font-bold">XXX</code> eller <code class="bg-slate-200 px-1 py-0.5 rounded font-mono font-bold">OOO</code>, varken vågrätt eller lodrätt).
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
+          <div>
+            <strong class="text-slate-900 block">Alla rader och kolumner är unika</strong>
+            Ingen rad får vara identisk med en annan rad. Samma gäller för kolumnerna.
+          </div>
+        </div>
+
+        <div class="space-y-2 border-t border-slate-200 pt-3">
+          <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Svårighetsgrader:</h4>
+          <div class="p-2 rounded-lg border border-emerald-200 bg-emerald-50/60 text-emerald-950 text-xs">
+            <strong class="text-emerald-900 font-semibold block">🟢 Lätt (~52–58 ledtrådar):</strong>
+            Löses enbart med enkla regler (parblockering, sandwich och räkning till 6).
+          </div>
+          <div class="p-2 rounded-lg border border-amber-200 bg-amber-50/60 text-amber-950 text-xs">
+            <strong class="text-amber-900 font-semibold block">🟡 Medel (~42–46 ledtrådar):</strong>
+            Kräver även radjämförelser och enkel uteslutning.
+          </div>
+          <div class="p-2 rounded-lg border border-rose-200 bg-rose-50/60 text-rose-950 text-xs">
+            <strong class="text-rose-900 font-semibold block">🔴 Svår (~34–38 ledtrådar):</strong>
+            Få ledtrådar och djupare logiska kedjor.
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end">
+        <button onclick="toggleRulesModal(false)" class="px-4 py-2 bg-slate-900 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-slate-800 transition cursor-pointer">
+          Stäng & Fortsätt
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Toast-meddelande -->
+  <div id="toast" class="no-print fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-xl border border-slate-700 transition-all duration-300 transform translate-y-20 opacity-0 flex items-center gap-2.5 pointer-events-none z-50">
+    <span id="toast-icon">✨</span>
+    <span id="toast-msg">Meddelande</span>
+  </div>
+
+  <script>
+    const state = {
+      difficulty: 'easy',       // 'easy', 'medium', 'hard'
+      count: 4,                 // 4 st (1 ark), 8 st (2 ark), 12 st (3 ark)
+      boardPrintSize: '90mm',   // Fyller 4 per A4
+      includeSolutions: true,
+      showRulesStrip: true,
+      puzzles: []
+    };
+
+    /**
+     * Fyra fullt verifierade, matematiskt giltiga 12x12 Takuzu-grundlösningar.
+     * Uppfyller:
+     * - Exakt 6 st 1 (X) och 6 st 0 (O) per rad och kolumn
+     * - Max två likadana i rad
+     * - Inga identiska rader eller kolumner
+     */
+    const BASE_SEEDS = [
+      [
+        [1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0],
+        [0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1],
+        [0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0],
+        [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
+        [0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0],
+        [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+        [1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
+        [1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
+        [0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1]
+      ],
+      [
+        [0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0],
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1],
+        [0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0],
+        [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1],
+        [0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0],
+        [1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1],
+        [0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0],
+        [1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1],
+        [0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1],
+        [1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0],
+        [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
+        [0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1]
+      ],
+      [
+        [1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1],
+        [0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0],
+        [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0],
+        [0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1],
+        [0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+        [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1],
+        [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0],
+        [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
+        [0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0]
+      ],
+      [
+        [0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0],
+        [1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1],
+        [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+        [0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0],
+        [0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1],
+        [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0],
+        [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1],
+        [1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+      ]
+    ];
+    /**
+     * Skapar en slumpmässig men strikt giltig lösning genom matematiska transformationer.
+     */
+    function generateRandomFullBoard() {
+      const seedIdx = Math.floor(Math.random() * BASE_SEEDS.length);
+      let grid = BASE_SEEDS[seedIdx].map(row => [...row]);
+
+      // 1. Transponering
+      if (Math.random() < 0.5) {
+        grid = grid[0].map((_, c) => grid.map(r => r[c]));
+      }
+
+      // 2. Horisontell spegling
+      if (Math.random() < 0.5) {
+        grid = grid.map(row => [...row].reverse());
+      }
+
+      // 3. Vertikal spegling
+      if (Math.random() < 0.5) {
+        grid = [...grid].reverse();
+      }
+
+      // 4. Rotationer (0, 90, 180, 270 grader)
+      const rots = Math.floor(Math.random() * 4);
+      for (let i = 0; i < rots; i++) {
+        grid = grid[0].map((_, idx) => grid.map(r => r[idx]).reverse());
+      }
+
+      // 5. Inversion (1 <-> 0)
+      if (Math.random() < 0.5) {
+        grid = grid.map(row => row.map(v => 1 - v));
+      }
+
+      return grid;
+    }
+    /**
+     * Lösare för Lätt nivå: Använder enbart direkta regler:
+     * - Parblockering (XX_ -> O, _XX -> O)
+     * - Sandwich (X_X -> O)
+     * - Linjeräkning (när en rad/kolumn har 6 av en symbol)
+     */
+    function solveEasy(initialGrid) {
+      const grid = initialGrid.map(row => [...row]);
+      let filledCount = 0;
+      for (let r = 0; r < 12; r++) {
+        for (let c = 0; c < 12; c++) {
+          if (grid[r][c] !== -1) filledCount++;
+        }
+      }
+
+      let progress = true;
+      while (progress && filledCount < 144) {
+        progress = false;
+
+        // Horisontella par & sandwich
+        for (let r = 0; r < 12; r++) {
+          for (let c = 0; c < 12; c++) {
+            if (c <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r][c + 1] && grid[r][c + 2] === -1) {
+              grid[r][c + 2] = 1 - grid[r][c];
+              filledCount++;
+              progress = true;
+            }
+            if (c >= 2 && grid[r][c] !== -1 && grid[r][c] === grid[r][c - 1] && grid[r][c - 2] === -1) {
+              grid[r][c - 2] = 1 - grid[r][c];
+              filledCount++;
+              progress = true;
+            }
+            if (c <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r][c + 2] && grid[r][c + 1] === -1) {
+              grid[r][c + 1] = 1 - grid[r][c];
+              filledCount++;
+              progress = true;
+            }
+          }
+        }
+
+        // Vertikala par & sandwich
+        for (let c = 0; c < 12; c++) {
+          for (let r = 0; r < 12; r++) {
+            if (r <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r + 1][c] && grid[r + 2][c] === -1) {
+              grid[r + 2][c] = 1 - grid[r][c];
+              filledCount++;
+              progress = true;
+            }
+            if (r >= 2 && grid[r][c] !== -1 && grid[r][c] === grid[r - 1][c] && grid[r - 2][c] === -1) {
+              grid[r - 2][c] = 1 - grid[r][c];
+              filledCount++;
+              progress = true;
+            }
+            if (r <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r + 2][c] && grid[r + 1][c] === -1) {
+              grid[r + 1][c] = 1 - grid[r][c];
+              filledCount++;
+              progress = true;
+            }
+          }
+        }
+
+        // Radräkning (6 av en symbol)
+        for (let r = 0; r < 12; r++) {
+          let count0 = 0, count1 = 0;
+          for (let c = 0; c < 12; c++) {
+            if (grid[r][c] === 0) count0++;
+            else if (grid[r][c] === 1) count1++;
+          }
+          if (count0 === 6 && count1 < 6) {
+            for (let c = 0; c < 12; c++) {
+              if (grid[r][c] === -1) {
+                grid[r][c] = 1;
+                filledCount++;
+                progress = true;
+              }
+            }
+          } else if (count1 === 6 && count0 < 6) {
+            for (let c = 0; c < 12; c++) {
+              if (grid[r][c] === -1) {
+                grid[r][c] = 0;
+                filledCount++;
+                progress = true;
+              }
+            }
+          }
+        }
+
+        // Kolumnräkning (6 av en symbol)
+        for (let c = 0; c < 12; c++) {
+          let count0 = 0, count1 = 0;
+          for (let r = 0; r < 12; r++) {
+            if (grid[r][c] === 0) count0++;
+            else if (grid[r][c] === 1) count1++;
+          }
+          if (count0 === 6 && count1 < 6) {
+            for (let r = 0; r < 12; r++) {
+              if (grid[r][c] === -1) {
+                grid[r][c] = 1;
+                filledCount++;
+                progress = true;
+              }
+            }
+          } else if (count1 === 6 && count0 < 6) {
+            for (let r = 0; r < 12; r++) {
+              if (grid[r][c] === -1) {
+                grid[r][c] = 0;
+                filledCount++;
+                progress = true;
+              }
+            }
+          }
+        }
+      }
+
+      return {
+        solved: filledCount === 144,
+        grid: grid
+      };
+    }
+    /**
+     * Kontroll av entydighet och antal lösningar (avbryter vid 2).
+     */
+    function countSolutions(board, limit = 2) {
+      let count = 0;
+
+      function backtrack(grid) {
+        if (count >= limit) return;
+
+        const easy = solveEasy(grid);
+        const g = easy.grid;
+
+        // Kontrollera om rad/kolumn brutit reglerna
+        for (let r = 0; r < 12; r++) {
+          let count0 = 0, count1 = 0;
+          for (let c = 0; c < 12; c++) {
+            const v = g[r][c];
+            if (v === 0) count0++;
+            if (v === 1) count1++;
+            if (c <= 9 && v !== -1 && v === g[r][c + 1] && v === g[r][c + 2]) return;
+          }
+          if (count0 > 6 || count1 > 6) return;
+        }
+
+        for (let c = 0; c < 12; c++) {
+          let count0 = 0, count1 = 0;
+          for (let r = 0; r < 12; r++) {
+            const v = g[r][c];
+            if (v === 0) count0++;
+            if (v === 1) count1++;
+            if (r <= 9 && v !== -1 && v === g[r + 1][c] && v === g[r + 2][c]) return;
+          }
+          if (count0 > 6 || count1 > 6) return;
+        }
+
+        if (easy.solved) {
+          // Kontrollera att alla rader och kolumner är unika
+          const rowStrs = new Set();
+          for (let r = 0; r < 12; r++) {
+            const s = g[r].join('');
+            if (rowStrs.has(s)) return;
+            rowStrs.add(s);
+          }
+          const colStrs = new Set();
+          for (let c = 0; c < 12; c++) {
+            let s = '';
+            for (let r = 0; r < 12; r++) s += g[r][c];
+            if (colStrs.has(s)) return;
+            colStrs.add(s);
+          }
+
+          count++;
+          return;
+        }
+
+        // Hitta den mest begränsade tomma rutan
+        let bestR = -1, bestC = -1, maxFilled = -1;
+        for (let r = 0; r < 12; r++) {
+          for (let c = 0; c < 12; c++) {
+            if (g[r][c] === -1) {
+              let filled = 0;
+              for (let k = 0; k < 12; k++) {
+                if (g[r][k] !== -1) filled++;
+                if (g[k][c] !== -1) filled++;
+              }
+              if (filled > maxFilled) {
+                maxFilled = filled;
+                bestR = r;
+                bestC = c;
+              }
+            }
+          }
+        }
+
+        if (bestR === -1) return;
+
+        for (const val of [0, 1]) {
+          g[bestR][bestC] = val;
+          backtrack(g);
+          g[bestR][bestC] = -1;
+          if (count >= limit) return;
+        }
+      }
+
+      backtrack(board);
+      return count;
+    }
+    function createPuzzleByDifficulty(diff) {
+      const fullSolution = generateRandomFullBoard();
+      const puzzle = fullSolution.map(row => [...row]);
+
+      // Slumpmässig ordning över alla 144 rutor
+      const positions = [];
+      for (let r = 0; r < 12; r++) {
+        for (let c = 0; c < 12; c++) {
+          positions.push({ r, c });
+        }
+      }
+      positions.sort(() => Math.random() - 0.5);
+
+      let cluesRemaining = 144;
+      let targetMinClues = 54; // Lätt: ~52-58 ledtrådar
+      if (diff === 'medium') targetMinClues = 44; // Medel: ~42-46
+      if (diff === 'hard') targetMinClues = 36;   // Svår: ~34-38
+
+      for (const { r, c } of positions) {
+        if (cluesRemaining <= targetMinClues) break;
+
+        const originalVal = puzzle[r][c];
+        puzzle[r][c] = -1;
+
+        let canRemove = false;
+
+        if (diff === 'easy') {
+          // Lätt: Kräver 100% direkt lösbarhet enbart med enkla regler
+          const res = solveEasy(puzzle);
+          canRemove = res.solved;
+        } else {
+          // Medel och Svår: Garanterat entydig och unik lösning
+          canRemove = countSolutions(puzzle, 2) === 1;
+        }
+
+        if (canRemove) {
+          cluesRemaining--;
+        } else {
+          puzzle[r][c] = originalVal;
+        }
+      }
+
+      return {
+        initialGrid: puzzle,
+        userGrid: puzzle.map(row => [...row]),
+        solutionGrid: fullSolution,
+        cluesCount: cluesRemaining
+      };
+    }
+
+    function generateAllPuzzles() {
+      const btn = document.getElementById('btn-generate');
+      const origText = btn.innerHTML;
+      btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Skapar...`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        state.puzzles = [];
+        for (let i = 0; i < state.count; i++) {
+          const pData = createPuzzleByDifficulty(state.difficulty);
+          state.puzzles.push({
+            id: i + 1,
+            initialGrid: pData.initialGrid,
+            userGrid: pData.userGrid,
+            solutionGrid: pData.solutionGrid,
+            cluesCount: pData.cluesCount,
+            showSolution: false
+          });
+        }
+        renderPages();
+        btn.innerHTML = origText;
+        btn.disabled = false;
+
+        const diffLabel = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }[state.difficulty];
+        showToast(`🎉 ${state.count} st nya pussel (${diffLabel}) klara!`, '✨');
+      }, 40);
+    }
+    function renderPages() {
+      const container = document.getElementById('pages-container');
+      container.innerHTML = '';
+
+      const puzzlesPerPage = 4; // Fast optimerat för 4 per A4
+      const totalPuzzles = state.puzzles.length;
+      const totalPages = Math.ceil(totalPuzzles / puzzlesPerPage);
+      const diffSwedish = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }[state.difficulty];
+
+      // 1. Skapa pusselsidor (4 per ark)
+      for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+        const start = pageIdx * puzzlesPerPage;
+        const pagePuzzles = state.puzzles.slice(start, start + puzzlesPerPage);
+
+        const pageEl = document.createElement('section');
+        pageEl.className = 'a4-page';
+
+        // Ultrakompakt sidhuvud för minimalt höjdspill
+        let headerHtml = '';
+        if (state.showRulesStrip) {
+          headerHtml = `
+            <div class="w-full pb-1 mb-1 border-b-2 border-slate-900 flex items-center justify-between text-slate-900 leading-none">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight">XO TIC-TAC-LOGIC 12×12</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-slate-200 text-slate-800">${diffSwedish}</span>
+              </div>
+              <div class="text-[10px] sm:text-[11px] font-medium text-slate-700 hidden sm:block">
+                Regler: Max 2 i rad • Exakt sex X & sex O per linje • Alla rader & kolumner är unika
+              </div>
+              <div class="text-[10.5px] font-mono font-semibold text-slate-600">
+                Sida ${pageIdx + 1} av ${totalPages + (state.includeSolutions ? 1 : 0)}
+              </div>
+            </div>
+          `;
+        } else {
+          headerHtml = `
+            <div class="w-full pb-1 mb-1 border-b border-slate-300 flex items-center justify-between text-slate-600 font-mono text-[10.5px]">
+              <span>Tic-Tac-Logic 12×12 (${diffSwedish})</span>
+              <span>Sida ${pageIdx + 1}</span>
+            </div>
+          `;
+        }
+
+        let puzzlesHtml = `<div class="print-grid-4 flex-1">`;
+        pagePuzzles.forEach(puzzle => {
+          puzzlesHtml += renderPuzzleCard(puzzle);
+        });
+        puzzlesHtml += `</div>`;
+
+        pageEl.innerHTML = headerHtml + puzzlesHtml;
+        container.appendChild(pageEl);
+      }
+
+      // 2. Skapa separat facitsida om ikryssad
+      if (state.includeSolutions && state.puzzles.length > 0) {
+        const solPageEl = document.createElement('section');
+        solPageEl.className = 'a4-page';
+
+        const solHeaderHtml = `
+          <div class="w-full pb-1 mb-2 border-b-2 border-slate-900 flex items-center justify-between text-slate-900">
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight">FACIT / LÖSNINGAR – TIC-TAC-LOGIC 12×12</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-slate-200 text-slate-800">${diffSwedish}</span>
+            </div>
+            <span class="text-[10.5px] font-mono text-slate-600">Lösningsbilaga</span>
+          </div>
+        `;
+
+        const solCols = state.puzzles.length > 4 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2';
+        let solCardsHtml = `<div class="flex-1 grid ${solCols} gap-4 items-center justify-center py-2">`;
+        state.puzzles.forEach(puzzle => {
+          solCardsHtml += renderSolutionThumbnail(puzzle);
+        });
+        solCardsHtml += `</div>`;
+
+        solPageEl.innerHTML = solHeaderHtml + solCardsHtml;
+        container.appendChild(solPageEl);
+      }
+    }
+    /**
+     * Renderar ett pusselbräde.
+     * OBSERVERA: Alla inre linjer är helt jämna och tunna (1px).
+     * Endast den yttre kanten runt 12x12-brädet är kraftig (2.5px solid #000).
+     */
+    function renderPuzzleCard(puzzle) {
+      const isShowingSol = puzzle.showSolution;
+      const displayGrid = isShowingSol ? puzzle.solutionGrid : puzzle.userGrid;
+
+      let cellsHtml = '';
+      for (let r = 0; r < 12; r++) {
+        for (let c = 0; c < 12; c++) {
+          const isInitial = puzzle.initialGrid[r][c] !== -1;
+          const val = displayGrid[r][c];
+          const isDarkSquare = (r + c) % 2 === 1;
+
+          let char = '';
+          if (val === 1) char = 'X';
+          else if (val === 0) char = 'O';
+
+          // Helt jämna inre linjer (inga tjocka stödlinjer inuti).
+          // Ytterkanten (c === 11 eller r === 11) har ingen inre kant för att inte dubblera ytterramen.
+          const borderRight = (c === 11) ? 'cell-right-edge' : 'border-r border-slate-300';
+          const borderBottom = (r === 11) ? 'cell-bottom-edge' : 'border-b border-slate-300';
+          const checkerBg = isDarkSquare ? 'cell-dark bg-slate-100/90' : 'cell-light bg-white';
+
+          let cellClass = `cell w-6 h-6 sm:w-7 sm:h-7 text-xs sm:text-sm ${borderRight} ${borderBottom} ${checkerBg} font-symbol flex items-center justify-center select-none relative focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:z-10 transition-colors `;
+
+          if (isInitial) {
+            cellClass += 'print-cell-initial text-slate-950 font-black cursor-default';
+          } else {
+            cellClass += 'hover:ring-1 hover:ring-indigo-400 cursor-pointer ';
+            if (val === 1) cellClass += 'print-cell-user text-indigo-600 font-bold';
+            else if (val === 0) cellClass += 'print-cell-user text-rose-600 font-bold';
+          }
+
+          cellsHtml += `
+            <div 
+              id="cell-${puzzle.id}-${r}-${c}"
+              data-puzzle="${puzzle.id}"
+              data-row="${r}"
+              data-col="${c}"
+              onclick="handleCellClick(${puzzle.id}, ${r}, ${c})"
+              oncontextmenu="handleCellRightClick(event, ${puzzle.id}, ${r}, ${c})"
+              tabindex="0"
+              onkeydown="handleCellKeyDown(event, ${puzzle.id}, ${r}, ${c})"
+              class="${cellClass}"
+            >
+              ${char}
+            </div>
+          `;
+        }
+      }
+
+      return `
+        <div class="print-board-card-4 max-w-[360px] w-full flex flex-col items-center">
+          <div class="w-full flex items-center justify-between mb-1 px-0.5">
+            <span class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
+              Pussel #${puzzle.id}
+              <span class="text-[10px] font-normal text-slate-500 ml-1">(${puzzle.cluesCount} ledtrådar)</span>
+            </span>
+
+            <div class="no-print flex items-center gap-1">
+              <button onclick="togglePuzzleSolution(${puzzle.id})" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium transition cursor-pointer">
+                ${isShowingSol ? 'Dölj facit' : 'Facit'}
+              </button>
+              <button onclick="resetPuzzleUserGrid(${puzzle.id})" class="text-[11px] px-1.5 py-0.5 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Rensa ifyllda rutor">
+                Rensa
+              </button>
+            </div>
+          </div>
+
+          <!-- Ytterkant: Fet 2.5px solid #000 runt hela brädet -->
+          <div class="print-board-grid-4 inline-grid grid-cols-12 border-[2.5px] border-slate-900 bg-white shadow-xs">
+            ${cellsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSolutionThumbnail(puzzle) {
+      let cellsHtml = '';
+      for (let r = 0; r < 12; r++) {
+        for (let c = 0; c < 12; c++) {
+          const val = puzzle.solutionGrid[r][c];
+          const char = val === 1 ? 'X' : 'O';
+          const isDarkSquare = (r + c) % 2 === 1;
+          const bgClass = isDarkSquare ? 'cell-dark bg-slate-100' : 'cell-light bg-white';
+          const borderRight = (c === 11) ? '' : 'border-r border-slate-200';
+          const borderBottom = (r === 11) ? '' : 'border-b border-slate-200';
+          const charColor = val === 1 ? 'text-slate-900 font-bold' : 'text-slate-600 font-medium';
+
+          cellsHtml += `
+            <div class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[9px] sm:text-[10px] ${borderRight} ${borderBottom} ${bgClass} ${charColor} font-symbol flex items-center justify-center">
+              ${char}
+            </div>
+          `;
+        }
+      }
+
+      return `
+        <div class="flex flex-col items-center p-2 rounded-lg border border-slate-300 bg-slate-50/50">
+          <span class="text-xs font-bold text-slate-800 mb-1">Facit: Pussel #${puzzle.id}</span>
+          <div class="inline-grid grid-cols-12 border-2 border-slate-900 bg-white shadow-xs">
+            ${cellsHtml}
+          </div>
+        </div>
+      `;
+    }
+    function handleCellClick(puzzleId, r, c) {
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle || puzzle.initialGrid[r][c] !== -1) return;
+
+      const current = puzzle.userGrid[r][c];
+      let nextVal = -1;
+      if (current === -1) nextVal = 1;      // Tom -> X
+      else if (current === 1) nextVal = 0;  // X -> O
+      else if (current === 0) nextVal = -1; // O -> Tom
+
+      puzzle.userGrid[r][c] = nextVal;
+      updateCellDisplay(puzzleId, r, c, nextVal, false);
+      checkImmediateAdjacency(puzzleId, r, c);
+    }
+
+    function handleCellRightClick(e, puzzleId, r, c) {
+      e.preventDefault();
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle || puzzle.initialGrid[r][c] !== -1) return;
+
+      const current = puzzle.userGrid[r][c];
+      let nextVal = -1;
+      if (current === -1) nextVal = 0;      // Tom -> Direkt O
+      else if (current === 0) nextVal = 1;  // O -> X
+      else if (current === 1) nextVal = -1; // X -> Tom
+
+      puzzle.userGrid[r][c] = nextVal;
+      updateCellDisplay(puzzleId, r, c, nextVal, false);
+      checkImmediateAdjacency(puzzleId, r, c);
+    }
+
+    function handleCellKeyDown(e, puzzleId, r, c) {
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle) return;
+
+      // Tangentbordsnavigering
+      if (e.key === 'ArrowUp' && r > 0) {
+        document.getElementById(`cell-${puzzleId}-${r - 1}-${c}`)?.focus();
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'ArrowDown' && r < 11) {
+        document.getElementById(`cell-${puzzleId}-${r + 1}-${c}`)?.focus();
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'ArrowLeft' && c > 0) {
+        document.getElementById(`cell-${puzzleId}-${r}-${c - 1}`)?.focus();
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'ArrowRight' && c < 11) {
+        document.getElementById(`cell-${puzzleId}-${r}-${c + 1}`)?.focus();
+        e.preventDefault();
+        return;
+      }
+
+      if (puzzle.initialGrid[r][c] !== -1) return;
+
+      const key = e.key.toUpperCase();
+      if (key === 'X') {
+        puzzle.userGrid[r][c] = 1;
+        updateCellDisplay(puzzleId, r, c, 1, false);
+        e.preventDefault();
+      } else if (key === 'O' || key === '0') {
+        puzzle.userGrid[r][c] = 0;
+        updateCellDisplay(puzzleId, r, c, 0, false);
+        e.preventDefault();
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        puzzle.userGrid[r][c] = -1;
+        updateCellDisplay(puzzleId, r, c, -1, false);
+        e.preventDefault();
+      } else if (e.key === ' ' || e.key === 'Spacebar') {
+        handleCellClick(puzzleId, r, c);
+        e.preventDefault();
+      }
+    }
+
+    function updateCellDisplay(puzzleId, r, c, val, isError) {
+      const cell = document.getElementById(`cell-${puzzleId}-${r}-${c}`);
+      if (!cell) return;
+
+      let char = '';
+      if (val === 1) char = 'X';
+      else if (val === 0) char = 'O';
+
+      cell.textContent = char;
+      cell.classList.remove('text-indigo-600', 'text-rose-600', 'bg-rose-100', 'text-rose-700');
+
+      if (val === 1) cell.classList.add('text-indigo-600');
+      else if (val === 0) cell.classList.add('text-rose-600');
+
+      if (isError) cell.classList.add('bg-rose-100', 'text-rose-700');
+    }
+
+    function checkImmediateAdjacency(puzzleId, r, c) {
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle) return;
+      const g = puzzle.userGrid;
+
+      // Horisontell 3 i rad
+      for (let j = 0; j <= 9; j++) {
+        if (g[r][j] !== -1 && g[r][j] === g[r][j+1] && g[r][j] === g[r][j+2]) {
+          showToast('⚠️ Obs: Högst två likadana symboler intill varandra!', '⚠️');
+          return;
+        }
+      }
+      // Vertikal 3 i rad
+      for (let i = 0; i <= 9; i++) {
+        if (g[i][c] !== -1 && g[i][c] === g[i+1][c] && g[i][c] === g[i+2][c]) {
+          showToast('⚠️ Obs: Högst två likadana symboler i kolumnen!', '⚠️');
+          return;
+        }
+      }
+    }
+    function checkAllPuzzles() {
+      let mistakes = 0;
+      let uncompleted = 0;
+
+      state.puzzles.forEach(puzzle => {
+        for (let r = 0; r < 12; r++) {
+          for (let c = 0; c < 12; c++) {
+            const userVal = puzzle.userGrid[r][c];
+            const correctVal = puzzle.solutionGrid[r][c];
+            if (userVal === -1) {
+              uncompleted++;
+            } else if (userVal !== correctVal) {
+              mistakes++;
+              updateCellDisplay(puzzle.id, r, c, userVal, true);
+            }
+          }
+        }
+      });
+
+      if (mistakes > 0) {
+        showToast(`Hittade ${mistakes} felaktiga rutor (markerade i rött).`, '❌');
+      } else if (uncompleted > 0) {
+        showToast('Alla dina ifyllda rutor är korrekta! Fortsätt klura 🎉', '👏');
+      } else {
+        showToast('Lysande! Du har löst alla pussel helt korrekt! 🏆', '⭐');
+      }
+    }
+
+    function togglePuzzleSolution(puzzleId) {
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle) return;
+      puzzle.showSolution = !puzzle.showSolution;
+      renderPages();
+    }
+
+    function resetPuzzleUserGrid(puzzleId) {
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle) return;
+      puzzle.userGrid = puzzle.initialGrid.map(row => [...row]);
+      puzzle.showSolution = false;
+      renderPages();
+      showToast(`Pussel #${puzzleId} rensat.`, '🔄');
+    }
+
+    function resetAllUserInput() {
+      state.puzzles.forEach(p => {
+        p.userGrid = p.initialGrid.map(row => [...row]);
+        p.showSolution = false;
+      });
+      renderPages();
+      showToast('Alla dina ifyllda rutor har återställts.', '🔄');
+    }
+
+    function setDifficulty(newDiff) {
+      if (state.difficulty === newDiff) return;
+      state.difficulty = newDiff;
+
+      const btnEasy = document.getElementById('diff-easy');
+      const btnMed = document.getElementById('diff-medium');
+      const btnHard = document.getElementById('diff-hard');
+      const badge = document.getElementById('header-diff-badge');
+      const pill = document.getElementById('diff-description-pill');
+
+      [btnEasy, btnMed, btnHard].forEach(b => {
+        b.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-900 cursor-pointer';
+      });
+
+      if (newDiff === 'easy') {
+        btnEasy.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-emerald-700 shadow-xs cursor-pointer';
+        badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200';
+        badge.textContent = 'Lätt nivå';
+        pill.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+        pill.textContent = 'Lätt nivå (~52–58 ledtrådar, 100% direkt lösbart)';
+      } else if (newDiff === 'medium') {
+        btnMed.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-amber-700 shadow-xs cursor-pointer';
+        badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full border bg-amber-100 text-amber-800 border-amber-200';
+        badge.textContent = 'Medel nivå';
+        pill.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200';
+        pill.textContent = 'Medel nivå (~42–46 ledtrådar, radjämförelser)';
+      } else if (newDiff === 'hard') {
+        btnHard.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-rose-700 shadow-xs cursor-pointer';
+        badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full border bg-rose-100 text-rose-800 border-rose-200';
+        badge.textContent = 'Svår nivå';
+        pill.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200';
+        pill.textContent = 'Svår nivå (~34–38 ledtrådar, få ledtrådar & djupare logik)';
+      }
+
+      generateAllPuzzles();
+    }
+
+    function changeCount(newCount) {
+      state.count = newCount;
+      generateAllPuzzles();
+    }
+
+    function changePrintBoardSize(newSize) {
+      state.boardPrintSize = newSize;
+      document.documentElement.style.setProperty('--board-size-4print', newSize);
+      renderPages();
+      showToast(`Utskriftsstorlek satt till ${newSize}`, '📐');
+    }
+
+    function toggleIncludeSolutions(val) {
+      state.includeSolutions = val;
+      renderPages();
+    }
+
+    function toggleRulesStrip(val) {
+      state.showRulesStrip = val;
+      renderPages();
+    }
+
+    function toggleRulesModal(show) {
+      const modal = document.getElementById('rules-modal');
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function showToast(msg, icon = 'ℹ️') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      document.getElementById('toast-icon').textContent = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3200);
+    }
+
+    // Initiera vid laddning
+    window.addEventListener('DOMContentLoaded', () => {
+      generateAllPuzzles();
+    });
+  </script>
+</body>
+</html>
