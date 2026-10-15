@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tic-Tac-Logic 12×12 – A4 Generator & Utskrift</title>
+  <title>Tic-Tac-Logic – A4 Generator & Utskrift</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter och JetBrains Mono -->
@@ -26,9 +26,14 @@
 
   <style>
     :root {
-      --board-size-4print: 90mm; /* Fyller 4 per A4 perfekt */
-      --cell-size-4print: calc(var(--board-size-4print) / 12);
-      --font-size-4print: calc(var(--cell-size-4print) * 0.70);
+      --grid-dim: 12;
+      --page-cols: 2;
+      --page-rows: 2;
+      --board-size: 88mm;
+      --cell-font-size: 5.1mm;
+      --card-title-size: 9.5pt;
+      --page-gap-y: 4mm;
+      --page-gap-x: 6mm;
     }
 
     .font-symbol {
@@ -36,13 +41,152 @@
       user-select: none;
     }
 
+    /* Gemensam A4- och brädstruktur för både skärm (WYSIWYG) och utskrift */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .puzzle-page-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--page-cols), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--page-rows), minmax(0, 1fr));
+      gap: var(--page-gap-y) var(--page-gap-x);
+      flex: 1;
+      align-items: center;
+      justify-items: center;
+      width: 100%;
+    }
+
+    .board-card {
+      width: var(--board-size);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .board-card-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1mm;
+      font-size: var(--card-title-size);
+      line-height: 1.1;
+    }
+
+    .board-grid {
+      width: var(--board-size);
+      height: var(--board-size);
+      display: grid;
+      grid-template-columns: repeat(var(--grid-dim), 1fr);
+      grid-template-rows: repeat(var(--grid-dim), 1fr);
+      border: 2.2px solid #0f172a;
+      box-sizing: border-box;
+      background-color: #ffffff;
+    }
+
+    .board-grid .cell {
+      width: 100%;
+      height: 100%;
+      font-size: var(--cell-font-size);
+      line-height: 1;
+      border-right: 1px solid #94a3b8;
+      border-bottom: 1px solid #94a3b8;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .board-grid .cell-right-edge {
+      border-right: none !important;
+    }
+
+    .board-grid .cell-bottom-edge {
+      border-bottom: none !important;
+    }
+
+    .cell-light {
+      background-color: #ffffff;
+    }
+
+    .cell-dark {
+      background-color: #f1f5f9;
+    }
+
+    /* Facit-miniatyrer */
+    .sol-page-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4mm;
+      flex: 1;
+      align-content: start;
+      justify-items: center;
+      padding-top: 2mm;
+    }
+
+    .sol-grid {
+      width: 52mm;
+      height: 52mm;
+      display: grid;
+      grid-template-columns: repeat(var(--grid-dim), 1fr);
+      grid-template-rows: repeat(var(--grid-dim), 1fr);
+      border: 1.8px solid #0f172a;
+      box-sizing: border-box;
+      background: #ffffff;
+    }
+
+    .sol-grid .sol-cell {
+      font-size: calc(52mm / var(--grid-dim) * 0.65);
+      line-height: 1;
+      border-right: 0.5px solid #cbd5e1;
+      border-bottom: 0.5px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Skärmspecifik styling */
+    @media screen {
+      .a4-page {
+        margin: 0 auto 2.5rem auto;
+        padding: 8mm 9mm;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e2e8f0;
+      }
+
+      /* Responsiv nedskalning på mindre skärmar */
+      @media (max-width: 840px) {
+        .a4-page {
+          width: 100%;
+          min-height: auto;
+          padding: 1rem;
+        }
+        .puzzle-page-grid {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+          gap: 1.5rem;
+        }
+        .sol-page-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    }
+
     /* ==========================================================================
-       UTSKRIFTSLAYOUT FÖR A4 (Maximerat utnyttjande utan inre tjocka linjer)
+       UTSKRIFTSLAYOUT FÖR A4
        ========================================================================== */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 6mm 7mm 6mm 7mm; /* Minimerade marginaler för maximal brädstorlek */
+        margin: 6mm 7mm 6mm 7mm;
       }
 
       body {
@@ -65,22 +209,20 @@
         margin: 0 !important;
       }
 
-      /* Strikt A4-ark med ren sidbrytning */
       .a4-page {
-        height: 284mm !important;
-        max-height: 284mm !important;
+        width: 100% !important;
+        height: 283mm !important;
+        min-height: 283mm !important;
+        max-height: 283mm !important;
         page-break-after: always !important;
         break-after: page !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
         box-shadow: none !important;
         border: none !important;
+        border-radius: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
-        box-sizing: border-box !important;
         overflow: hidden !important;
       }
 
@@ -89,65 +231,24 @@
         break-after: auto !important;
       }
 
-      /* 2x2 rutnät för 4 pussel per A4 */
-      .print-grid-4 {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        grid-template-rows: repeat(2, 1fr) !important;
-        gap: 6mm 8mm !important;
-        height: 268mm !important;
-        align-items: center !important;
-        justify-items: center !important;
-        padding: 1mm 0 !important;
+      .board-grid {
+        border: 2.2px solid #000000 !important;
       }
 
-      .print-board-card-4 {
-        width: var(--board-size-4print) !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-      }
-
-      /* Yttre ram är fet (2.5px solid #000) */
-      .print-board-grid-4 {
-        width: var(--board-size-4print) !important;
-        height: var(--board-size-4print) !important;
-        display: grid !important;
-        grid-template-columns: repeat(12, 1fr) !important;
-        grid-template-rows: repeat(12, 1fr) !important;
-        border: 2.5px solid #000000 !important;
-        box-sizing: border-box !important;
-      }
-
-      /* Inre rutlinjer: Helt jämna och tunna (1px solid #71717a) */
-      .print-board-grid-4 .cell {
-        width: 100% !important;
-        height: 100% !important;
-        font-size: var(--font-size-4print) !important;
-        line-height: 1 !important;
+      .board-grid .cell {
         color: #000000 !important;
         border-right: 1px solid #71717a !important;
         border-bottom: 1px solid #71717a !important;
-        box-sizing: border-box !important;
       }
 
-      /* Ta bort dubbelkant på yttersta höger- och nederkant */
-      .print-board-grid-4 .cell-right-edge {
-        border-right: none !important;
-      }
-      .print-board-grid-4 .cell-bottom-edge {
-        border-bottom: none !important;
-      }
-
-      /* Schackbrädemönster för utskrift */
       .cell-light {
         background-color: #ffffff !important;
       }
+
       .cell-dark {
         background-color: #e9eef4 !important;
       }
 
-      /* Förtryckta ledtrådar: Feta och skarpt svarta utan att störa schackmönstret */
       .print-cell-initial {
         font-weight: 900 !important;
         color: #000000 !important;
@@ -158,53 +259,12 @@
         font-weight: 700 !important;
       }
     }
-
-    /* Schackbrädemönster på skärmen */
-    .cell-light {
-      background-color: #ffffff;
-    }
-    .cell-dark {
-      background-color: #f1f5f9;
-    }
-
-    /* Skärmvisning av ark */
-    @media screen {
-      .a4-page {
-        background: #ffffff;
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 2.5rem;
-        padding: 1.5rem;
-        min-height: 297mm;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-
-      .print-grid-4 {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2rem 1.75rem;
-        align-items: start;
-        justify-items: center;
-        padding: 0.75rem 0;
-      }
-
-      @media (max-width: 860px) {
-        .print-grid-4 {
-          grid-template-columns: 1fr;
-        }
-        .a4-page {
-          min-height: auto;
-        }
-      }
-    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
   <!-- Huvudverktygsfält (döljs vid utskrift) -->
-  <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+  <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       
       <!-- Logotyp och titel -->
@@ -214,12 +274,12 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            Tic-Tac-Logic 12×12
+            <span id="header-title-text">Tic-Tac-Logic 12×12</span>
             <span id="header-diff-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200">
               Lätt nivå
             </span>
           </h1>
-          <p class="text-xs text-slate-500">Optimerad för 4 pussel per A4 • Rena, jämna rutnät</p>
+          <p id="header-subtitle" class="text-xs text-slate-500">4 pussel per A4 • Direkt A4-förhandsgranskning</p>
         </div>
       </div>
 
@@ -246,14 +306,14 @@
     <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-2.5">
       <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-medium text-slate-600">
         
-        <!-- Vänstergrupp: Svårighetsgrad och antal -->
-        <div class="flex flex-wrap items-center gap-3 sm:gap-5">
+        <!-- Vänstergrupp: Inställningar för pussel och A4-layout -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
           
-          <!-- Svårighetsgradsväljare -->
+          <!-- Svårighetsgrad -->
           <div class="flex items-center gap-1.5">
-            <span class="text-slate-500 font-semibold">Svårighetsgrad:</span>
+            <span class="text-slate-500 font-semibold">Nivå:</span>
             <div class="inline-flex p-0.5 bg-slate-200 rounded-lg border border-slate-300">
-              <button id="diff-easy" onclick="setDifficulty('easy')" class="px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-emerald-700 shadow-xs cursor-pointer">
+              <button id="diff-easy" onclick="setDifficulty('easy')" class="px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-emerald-700 shadow-sm cursor-pointer">
                 Lätt
               </button>
               <button id="diff-medium" onclick="setDifficulty('medium')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-900 cursor-pointer">
@@ -265,24 +325,46 @@
             </div>
           </div>
 
-          <!-- Antal pussel (A4-ark) -->
+          <!-- Rutnätsstorlek -->
           <div class="flex items-center gap-1.5">
-            <span class="text-slate-500">Antal pussel:</span>
-            <select id="count-select" onchange="changeCount(parseInt(this.value))" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
-              <option value="4" selected>4 st (1 A4-ark)</option>
-              <option value="8">8 st (2 A4-ark)</option>
-              <option value="12">12 st (3 A4-ark)</option>
+            <span class="text-slate-500">Rutnät:</span>
+            <select id="grid-size-select" onchange="changeGridDimension(parseInt(this.value))" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="6">6×6 (Barn/Snabb)</option>
+              <option value="8">8×8 (Kompakt)</option>
+              <option value="10">10×10 (Mellan)</option>
+              <option value="12" selected>12×12 (Klassisk)</option>
             </select>
           </div>
 
-          <!-- Rutor i print storlek -->
+          <!-- Pussel per A4-sida -->
           <div class="flex items-center gap-1.5">
-            <span class="text-slate-500">Utskriftsstorlek:</span>
-            <select id="size-select" onchange="changePrintBoardSize(this.value)" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
-              <option value="86mm">Kompakt (86 mm)</option>
-              <option value="90mm" selected>Standard (90 mm - Fyller sidan)</option>
-              <option value="93mm">Maximal (93 mm)</option>
+            <span class="text-slate-500 font-semibold text-indigo-900">Pussel per A4:</span>
+            <select id="per-page-select" onchange="changePuzzlesPerPage(parseInt(this.value))" class="bg-indigo-50 border border-indigo-300 text-indigo-950 rounded-md px-2 py-1 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="1">1 st (1×1 – Extra stor)</option>
+              <option value="2">2 st (1×2 – Stor)</option>
+              <option value="4" selected>4 st (2×2 – Standard)</option>
+              <option value="6">6 st (2×3 – Kompakt)</option>
+              <option value="9">9 st (3×3 – Små)</option>
+              <option value="12">12 st (3×4 – Mini)</option>
             </select>
+          </div>
+
+          <!-- Antal A4-sidor -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500">Antal A4-ark:</span>
+            <select id="sheets-select" onchange="changeSheetsCount(parseInt(this.value))" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="1" selected>1 A4-ark (4 pussel)</option>
+              <option value="2">2 A4-ark (8 pussel)</option>
+              <option value="3">3 A4-ark (12 pussel)</option>
+              <option value="4">4 A4-ark (16 pussel)</option>
+            </select>
+          </div>
+
+          <!-- Finjustera brädstorlek (%) -->
+          <div class="flex items-center gap-2 bg-white px-2.5 py-1 rounded-md border border-slate-300">
+            <span class="text-slate-500">Storlek:</span>
+            <input id="scale-slider" type="range" min="75" max="106" step="1" value="100" oninput="changeScalePercent(parseInt(this.value))" class="w-20 accent-indigo-600 cursor-pointer">
+            <span id="scale-label" class="font-mono text-[11px] text-slate-800 font-semibold w-16 text-right">100% (88mm)</span>
           </div>
         </div>
 
@@ -301,19 +383,20 @@
       </div>
     </div>
   </header>
+
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-5 print:p-0 print:max-w-none">
     
     <!-- Skärmbanner med snabbhjälp -->
-    <div class="no-print mb-5 p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs sm:text-sm">
+    <div class="no-print mb-5 p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs sm:text-sm">
       <div class="flex items-start gap-3">
         <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg shrink-0 mt-0.5">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <p class="font-semibold text-slate-900">Spela direkt på skärmen eller skriv ut arken</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <p class="font-semibold text-slate-900">Spela direkt på A4-arket nedan eller skriv ut</p>
             <span id="diff-description-pill" class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Lätt nivå (~52–58 ledtrådar, 100% direkt lösbart)
+              Lätt nivå (100% direkt lösbart med enkla regler)
             </span>
           </div>
           <p class="text-xs text-slate-500 mt-0.5">
@@ -336,7 +419,7 @@
   </main>
 
   <!-- Modal: Regler och instruktioner -->
-  <div id="rules-modal" class="no-print fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4">
+  <div id="rules-modal" class="no-print fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <div class="flex items-center gap-2">
@@ -352,8 +435,8 @@
         <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
           <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
           <div>
-            <strong class="text-slate-900 block">Exakt 6 X och 6 O</strong>
-            Varje rad och varje kolumn ska innehålla exakt sex kryss (X) och sex cirklar (O).
+            <strong class="text-slate-900 block">Lika många X och O</strong>
+            Varje rad och varje kolumn ska innehålla exakt hälften kryss (X) och hälften cirklar (O) – alltså 6 av varje i ett 12×12-pussel.
           </div>
         </div>
 
@@ -369,23 +452,23 @@
           <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
           <div>
             <strong class="text-slate-900 block">Alla rader och kolumner är unika</strong>
-            Ingen rad får vara identisk med en annan rad. Samma gäller för kolumnerna.
+            Ingen rad får vara identisk med en annan rad. Samma sak gäller för kolumnerna.
           </div>
         </div>
 
         <div class="space-y-2 border-t border-slate-200 pt-3">
           <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Svårighetsgrader:</h4>
           <div class="p-2 rounded-lg border border-emerald-200 bg-emerald-50/60 text-emerald-950 text-xs">
-            <strong class="text-emerald-900 font-semibold block">🟢 Lätt (~52–58 ledtrådar):</strong>
-            Löses enbart med enkla regler (parblockering, sandwich och räkning till 6).
+            <strong class="text-emerald-900 font-semibold block">🟢 Lätt:</strong>
+            Löses enbart med direkta regler (parblockering <code class="font-mono">XX_</code>, sandwich <code class="font-mono">X_X</code> och räkning).
           </div>
           <div class="p-2 rounded-lg border border-amber-200 bg-amber-50/60 text-amber-950 text-xs">
-            <strong class="text-amber-900 font-semibold block">🟡 Medel (~42–46 ledtrådar):</strong>
-            Kräver även radjämförelser och enkel uteslutning.
+            <strong class="text-amber-900 font-semibold block">🟡 Medel:</strong>
+            Kräver även rad-/kolumnuteslutning (att placera sista symbolen utan att tvinga fram tre i rad).
           </div>
           <div class="p-2 rounded-lg border border-rose-200 bg-rose-50/60 text-rose-950 text-xs">
-            <strong class="text-rose-900 font-semibold block">🔴 Svår (~34–38 ledtrådar):</strong>
-            Få ledtrådar och djupare logiska kedjor.
+            <strong class="text-rose-900 font-semibold block">🔴 Svår:</strong>
+            Färre ledtrådar och djupare logiska kedjor, men alltid med en garanterat unik lösning.
           </div>
         </div>
       </div>
@@ -397,6 +480,7 @@
       </div>
     </div>
   </div>
+
   <!-- Toast-meddelande -->
   <div id="toast" class="no-print fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-xl border border-slate-700 transition-all duration-300 transform translate-y-20 opacity-0 flex items-center gap-2.5 pointer-events-none z-50">
     <span id="toast-icon">✨</span>
@@ -404,223 +488,302 @@
   </div>
 
   <script>
+    const STORAGE_KEY = 'tictaclogic_a4_state_v2';
+
+    // Layout-konfigurationer per A4-sida (100% basmått i mm som garanterat ryms på ett A4)
+    const LAYOUT_PRESETS = {
+      1:  { cols: 1, rows: 1, baseMm: 162, gapY: '6mm',   gapX: '6mm', titlePt: 11.5 },
+      2:  { cols: 1, rows: 2, baseMm: 118, gapY: '5mm',   gapX: '6mm', titlePt: 10.5 },
+      4:  { cols: 2, rows: 2, baseMm: 88,  gapY: '4.5mm', gapX: '7mm', titlePt: 9.5  },
+      6:  { cols: 2, rows: 3, baseMm: 76,  gapY: '3mm',   gapX: '7mm', titlePt: 8.5  },
+      9:  { cols: 3, rows: 3, baseMm: 57,  gapY: '3mm',   gapX: '4mm', titlePt: 8.0  },
+      12: { cols: 3, rows: 4, baseMm: 53,  gapY: '2mm',   gapX: '4mm', titlePt: 7.5  }
+    };
+
     const state = {
-      difficulty: 'easy',       // 'easy', 'medium', 'hard'
-      count: 4,                 // 4 st (1 ark), 8 st (2 ark), 12 st (3 ark)
-      boardPrintSize: '90mm',   // Fyller 4 per A4
+      gridDim: 12,          // 6, 8, 10 eller 12
+      difficulty: 'easy',   // 'easy', 'medium', 'hard'
+      perPage: 4,           // 1, 2, 4, 6, 9, 12 pussel per A4
+      sheetsCount: 1,       // Antal A4-sidor med pussel
+      scalePercent: 100,    // 75% - 106%
       includeSolutions: true,
       showRulesStrip: true,
       puzzles: []
     };
 
-    /**
-     * Fyra fullt verifierade, matematiskt giltiga 12x12 Takuzu-grundlösningar.
-     * Uppfyller:
-     * - Exakt 6 st 1 (X) och 6 st 0 (O) per rad och kolumn
-     * - Max två likadana i rad
-     * - Inga identiska rader eller kolumner
-     */
-    const BASE_SEEDS = [
-      [
-        [1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0],
-        [0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1],
-        [0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0],
-        [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
-        [0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0],
-        [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1],
-        [1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
-        [0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
-        [1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
-        [0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1]
-      ],
-      [
-        [0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0],
-        [1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1],
-        [0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0],
-        [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1],
-        [0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0],
-        [1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1],
-        [0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0],
-        [1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1],
-        [0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1],
-        [1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0],
-        [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
-        [0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1]
-      ],
-      [
-        [1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1],
-        [0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0],
-        [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0],
-        [0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1],
-        [0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
-        [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1],
-        [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0],
-        [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
-        [0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0]
-      ],
-      [
-        [0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0],
-        [1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1],
-        [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1],
-        [0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0],
-        [0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1],
-        [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0],
-        [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1],
-        [1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0]
-      ]
-    ];
-    /**
-     * Skapar en slumpmässig men strikt giltig lösning genom matematiska transformationer.
-     */
-    function generateRandomFullBoard() {
-      const seedIdx = Math.floor(Math.random() * BASE_SEEDS.length);
-      let grid = BASE_SEEDS[seedIdx].map(row => [...row]);
+    // Cache för alla giltiga rader per rutnätsstorlek
+    const validRowsCache = {};
 
-      // 1. Transponering
-      if (Math.random() < 0.5) {
-        grid = grid[0].map((_, c) => grid.map(r => r[c]));
+    function getValidRowsForDim(N) {
+      if (validRowsCache[N]) return validRowsCache[N];
+      const half = N / 2;
+      const valid = [];
+      const total = 1 << N;
+
+      for (let mask = 0; mask < total; mask++) {
+        let ones = 0;
+        let hasThree = false;
+        const row = new Array(N);
+
+        for (let c = 0; c < N; c++) {
+          const bit = (mask >> (N - 1 - c)) & 1;
+          row[c] = bit;
+          ones += bit;
+          if (c >= 2 && row[c] === row[c - 1] && row[c] === row[c - 2]) {
+            hasThree = true;
+            break;
+          }
+        }
+        if (!hasThree && ones === half) {
+          valid.push(row);
+        }
       }
-
-      // 2. Horisontell spegling
-      if (Math.random() < 0.5) {
-        grid = grid.map(row => [...row].reverse());
-      }
-
-      // 3. Vertikal spegling
-      if (Math.random() < 0.5) {
-        grid = [...grid].reverse();
-      }
-
-      // 4. Rotationer (0, 90, 180, 270 grader)
-      const rots = Math.floor(Math.random() * 4);
-      for (let i = 0; i < rots; i++) {
-        grid = grid[0].map((_, idx) => grid.map(r => r[idx]).reverse());
-      }
-
-      // 5. Inversion (1 <-> 0)
-      if (Math.random() < 0.5) {
-        grid = grid.map(row => row.map(v => 1 - v));
-      }
-
-      return grid;
+      validRowsCache[N] = valid;
+      return valid;
     }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
     /**
-     * Lösare för Lätt nivå: Använder enbart direkta regler:
-     * - Parblockering (XX_ -> O, _XX -> O)
-     * - Sandwich (X_X -> O)
-     * - Linjeräkning (när en rad/kolumn har 6 av en symbol)
+     * Genererar ett 100% nytt, slumpmässigt och giltigt NxN-bräde med backtracking rad-för-rad.
      */
-    function solveEasy(initialGrid) {
+    function generateRandomFullBoard(N) {
+      const half = N / 2;
+      const allRows = getValidRowsForDim(N);
+      const grid = [];
+      const usedRowIndices = new Set();
+      const colOnes = new Array(N).fill(0);
+      const colZeros = new Array(N).fill(0);
+
+      function solveRow(r) {
+        if (r === N) {
+          // Kontrollera att alla kolumner är unika
+          const colStrings = new Set();
+          for (let c = 0; c < N; c++) {
+            let s = '';
+            for (let i = 0; i < N; i++) s += grid[i][c];
+            if (colStrings.has(s)) return false;
+            colStrings.add(s);
+          }
+          return true;
+        }
+
+        const candidates = shuffleArray([...Array(allRows.length).keys()]);
+
+        for (const idx of candidates) {
+          if (usedRowIndices.has(idx)) continue;
+          const candidateRow = allRows[idx];
+
+          let ok = true;
+          for (let c = 0; c < N; c++) {
+            const v = candidateRow[c];
+            const n1 = colOnes[c] + (v === 1 ? 1 : 0);
+            const n0 = colZeros[c] + (v === 0 ? 1 : 0);
+
+            // Max N/2 av varje symbol i kolumnen
+            if (n1 > half || n0 > half) {
+              ok = false;
+              break;
+            }
+            // Max 2 i rad lodrätt
+            if (r >= 2 && grid[r - 1][c] === v && grid[r - 2][c] === v) {
+              ok = false;
+              break;
+            }
+            // Lookahead: Om det bara återstår 2 rader efter denna och kolumnen saknar 2 av samma symbol,
+            // får inte denna ruta också ha samma symbol (för då tvingas 3 i rad fram i slutet)
+            const rem = N - 1 - r;
+            if (rem === 2) {
+              if (half - n1 === 2 && v === 1) { ok = false; break; }
+              if (half - n0 === 2 && v === 0) { ok = false; break; }
+            }
+          }
+
+          if (!ok) continue;
+
+          grid.push(candidateRow);
+          usedRowIndices.add(idx);
+          for (let c = 0; c < N; c++) {
+            if (candidateRow[c] === 1) colOnes[c]++;
+            else colZeros[c]++;
+          }
+
+          if (solveRow(r + 1)) return true;
+
+          grid.pop();
+          usedRowIndices.delete(idx);
+          for (let c = 0; c < N; c++) {
+            if (candidateRow[c] === 1) colOnes[c]--;
+            else colZeros[c]--;
+          }
+        }
+        return false;
+      }
+
+      solveRow(0);
+      return grid.map(r => [...r]);
+    }
+
+    /**
+     * Logisk lösare:
+     * - 'easy': Parblockering (XX_ -> O), Sandwich (X_X -> O) samt rad/kolumn-räkning (N/2 fyllda).
+     * - 'medium': Ovanstående + rad/kolumn-uteslutning (om placering av sista X tvingar fram OOO) + unika rader/kolumner.
+     */
+    function solveLogical(initialGrid, N, level = 'easy') {
+      const half = N / 2;
       const grid = initialGrid.map(row => [...row]);
       let filledCount = 0;
-      for (let r = 0; r < 12; r++) {
-        for (let c = 0; c < 12; c++) {
+
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
           if (grid[r][c] !== -1) filledCount++;
         }
       }
 
+      const totalCells = N * N;
       let progress = true;
-      while (progress && filledCount < 144) {
+
+      while (progress && filledCount < totalCells) {
         progress = false;
 
-        // Horisontella par & sandwich
-        for (let r = 0; r < 12; r++) {
-          for (let c = 0; c < 12; c++) {
-            if (c <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r][c + 1] && grid[r][c + 2] === -1) {
-              grid[r][c + 2] = 1 - grid[r][c];
-              filledCount++;
-              progress = true;
+        // 1. Horisontella par & sandwich
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) {
+            if (c <= N - 3 && grid[r][c] !== -1 && grid[r][c] === grid[r][c + 1] && grid[r][c + 2] === -1) {
+              grid[r][c + 2] = 1 - grid[r][c]; filledCount++; progress = true;
             }
             if (c >= 2 && grid[r][c] !== -1 && grid[r][c] === grid[r][c - 1] && grid[r][c - 2] === -1) {
-              grid[r][c - 2] = 1 - grid[r][c];
-              filledCount++;
-              progress = true;
+              grid[r][c - 2] = 1 - grid[r][c]; filledCount++; progress = true;
             }
-            if (c <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r][c + 2] && grid[r][c + 1] === -1) {
-              grid[r][c + 1] = 1 - grid[r][c];
-              filledCount++;
-              progress = true;
+            if (c <= N - 3 && grid[r][c] !== -1 && grid[r][c] === grid[r][c + 2] && grid[r][c + 1] === -1) {
+              grid[r][c + 1] = 1 - grid[r][c]; filledCount++; progress = true;
             }
           }
         }
 
-        // Vertikala par & sandwich
-        for (let c = 0; c < 12; c++) {
-          for (let r = 0; r < 12; r++) {
-            if (r <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r + 1][c] && grid[r + 2][c] === -1) {
-              grid[r + 2][c] = 1 - grid[r][c];
-              filledCount++;
-              progress = true;
+        // 2. Vertikala par & sandwich
+        for (let c = 0; c < N; c++) {
+          for (let r = 0; r < N; r++) {
+            if (r <= N - 3 && grid[r][c] !== -1 && grid[r][c] === grid[r + 1][c] && grid[r + 2][c] === -1) {
+              grid[r + 2][c] = 1 - grid[r][c]; filledCount++; progress = true;
             }
             if (r >= 2 && grid[r][c] !== -1 && grid[r][c] === grid[r - 1][c] && grid[r - 2][c] === -1) {
-              grid[r - 2][c] = 1 - grid[r][c];
-              filledCount++;
-              progress = true;
+              grid[r - 2][c] = 1 - grid[r][c]; filledCount++; progress = true;
             }
-            if (r <= 9 && grid[r][c] !== -1 && grid[r][c] === grid[r + 2][c] && grid[r + 1][c] === -1) {
-              grid[r + 1][c] = 1 - grid[r][c];
-              filledCount++;
-              progress = true;
+            if (r <= N - 3 && grid[r][c] !== -1 && grid[r][c] === grid[r + 2][c] && grid[r + 1][c] === -1) {
+              grid[r + 1][c] = 1 - grid[r][c]; filledCount++; progress = true;
             }
           }
         }
 
-        // Radräkning (6 av en symbol)
-        for (let r = 0; r < 12; r++) {
-          let count0 = 0, count1 = 0;
-          for (let c = 0; c < 12; c++) {
-            if (grid[r][c] === 0) count0++;
-            else if (grid[r][c] === 1) count1++;
+        // 3. Radräkning (N/2 av en symbol uppnådd)
+        for (let r = 0; r < N; r++) {
+          let c0 = 0, c1 = 0;
+          for (let c = 0; c < N; c++) {
+            if (grid[r][c] === 0) c0++;
+            else if (grid[r][c] === 1) c1++;
           }
-          if (count0 === 6 && count1 < 6) {
-            for (let c = 0; c < 12; c++) {
-              if (grid[r][c] === -1) {
-                grid[r][c] = 1;
-                filledCount++;
-                progress = true;
-              }
+          if (c0 === half && c1 < half) {
+            for (let c = 0; c < N; c++) {
+              if (grid[r][c] === -1) { grid[r][c] = 1; filledCount++; progress = true; }
             }
-          } else if (count1 === 6 && count0 < 6) {
-            for (let c = 0; c < 12; c++) {
-              if (grid[r][c] === -1) {
-                grid[r][c] = 0;
-                filledCount++;
-                progress = true;
-              }
+          } else if (c1 === half && c0 < half) {
+            for (let c = 0; c < N; c++) {
+              if (grid[r][c] === -1) { grid[r][c] = 0; filledCount++; progress = true; }
             }
           }
         }
 
-        // Kolumnräkning (6 av en symbol)
-        for (let c = 0; c < 12; c++) {
-          let count0 = 0, count1 = 0;
-          for (let r = 0; r < 12; r++) {
-            if (grid[r][c] === 0) count0++;
-            else if (grid[r][c] === 1) count1++;
+        // 4. Kolumnräkning (N/2 av en symbol uppnådd)
+        for (let c = 0; c < N; c++) {
+          let c0 = 0, c1 = 0;
+          for (let r = 0; r < N; r++) {
+            if (grid[r][c] === 0) c0++;
+            else if (grid[r][c] === 1) c1++;
           }
-          if (count0 === 6 && count1 < 6) {
-            for (let r = 0; r < 12; r++) {
-              if (grid[r][c] === -1) {
-                grid[r][c] = 1;
-                filledCount++;
-                progress = true;
+          if (c0 === half && c1 < half) {
+            for (let r = 0; r < N; r++) {
+              if (grid[r][c] === -1) { grid[r][c] = 1; filledCount++; progress = true; }
+            }
+          } else if (c1 === half && c0 < half) {
+            for (let r = 0; r < N; r++) {
+              if (grid[r][c] === -1) { grid[r][c] = 0; filledCount++; progress = true; }
+            }
+          }
+        }
+
+        // 5. Medelsvåra logikregler (om vi inte redan gjort framsteg i detta varv)
+        if (!progress && level !== 'easy') {
+          // Rad-uteslutning via giltiga rader: om samtliga giltiga rader som matchar radens nuvarande
+          // ledtrådar (och inte är identiska med en redan färdig rad) har samma värde i kolumn c, är rutan given!
+          const allValid = getValidRowsForDim(N);
+          const completedRows = new Set();
+          for (let r = 0; r < N; r++) {
+            if (!grid[r].includes(-1)) completedRows.add(grid[r].join(''));
+          }
+
+          for (let r = 0; r < N; r++) {
+            if (!grid[r].includes(-1)) continue;
+            const matching = allValid.filter(cand => {
+              for (let c = 0; c < N; c++) {
+                if (grid[r][c] !== -1 && grid[r][c] !== cand[c]) return false;
+              }
+              return !completedRows.has(cand.join(''));
+            });
+
+            if (matching.length > 0) {
+              for (let c = 0; c < N; c++) {
+                if (grid[r][c] === -1) {
+                  const firstVal = matching[0][c];
+                  if (matching.every(m => m[c] === firstVal)) {
+                    grid[r][c] = firstVal;
+                    filledCount++;
+                    progress = true;
+                  }
+                }
               }
             }
-          } else if (count1 === 6 && count0 < 6) {
-            for (let r = 0; r < 12; r++) {
-              if (grid[r][c] === -1) {
-                grid[r][c] = 0;
-                filledCount++;
-                progress = true;
+          }
+
+          // Samma för kolumner
+          const completedCols = new Set();
+          for (let c = 0; c < N; c++) {
+            let full = true, s = '';
+            for (let r = 0; r < N; r++) {
+              if (grid[r][c] === -1) { full = false; break; }
+              s += grid[r][c];
+            }
+            if (full) completedCols.add(s);
+          }
+
+          for (let c = 0; c < N; c++) {
+            let hasEmpty = false;
+            for (let r = 0; r < N; r++) if (grid[r][c] === -1) hasEmpty = true;
+            if (!hasEmpty) continue;
+
+            const matching = allValid.filter(cand => {
+              for (let r = 0; r < N; r++) {
+                if (grid[r][c] !== -1 && grid[r][c] !== cand[r]) return false;
+              }
+              return !completedCols.has(cand.join(''));
+            });
+
+            if (matching.length > 0) {
+              for (let r = 0; r < N; r++) {
+                if (grid[r][c] === -1) {
+                  const firstVal = matching[0][r];
+                  if (matching.every(m => m[r] === firstVal)) {
+                    grid[r][c] = firstVal;
+                    filledCount++;
+                    progress = true;
+                  }
+                }
               }
             }
           }
@@ -628,72 +791,161 @@
       }
 
       return {
-        solved: filledCount === 144,
-        grid: grid
+        solved: filledCount === totalCells,
+        grid
       };
     }
+
     /**
-     * Kontroll av entydighet och antal lösningar (avbryter vid 2).
+     * Hittar ett pedagogiskt nästa steg (ledtråd) för spelaren på skärmen.
      */
-    function countSolutions(board, limit = 2) {
+    function findNextHint(userGrid, solutionGrid, N) {
+      const half = N / 2;
+
+      // 1. Kolla om spelaren gjort något direkt fel först
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          if (userGrid[r][c] !== -1 && userGrid[r][c] !== solutionGrid[r][c]) {
+            return { r, c, reason: `Ruta (${r + 1}, ${c + 1}) har fel symbol – prova att ändra den först.` };
+          }
+        }
+      }
+
+      // 2. Dubbelpar eller sandwich i rad
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          if (c <= N - 3 && userGrid[r][c] !== -1 && userGrid[r][c] === userGrid[r][c + 1] && userGrid[r][c + 2] === -1) {
+            const sym = userGrid[r][c] === 1 ? 'X' : 'O';
+            return { r, c: c + 2, reason: `Två ${sym} i rad på rad ${r + 1} – rutan bredvid måste vara ${sym === 'X' ? 'O' : 'X'}.` };
+          }
+          if (c >= 2 && userGrid[r][c] !== -1 && userGrid[r][c] === userGrid[r][c - 1] && userGrid[r][c - 2] === -1) {
+            const sym = userGrid[r][c] === 1 ? 'X' : 'O';
+            return { r, c: c - 2, reason: `Två ${sym} i rad på rad ${r + 1} – rutan före måste vara ${sym === 'X' ? 'O' : 'X'}.` };
+          }
+          if (c <= N - 3 && userGrid[r][c] !== -1 && userGrid[r][c] === userGrid[r][c + 2] && userGrid[r][c + 1] === -1) {
+            const sym = userGrid[r][c] === 1 ? 'X' : 'O';
+            return { r, c: c + 1, reason: `Sandwich (${sym}_${sym}) på rad ${r + 1} – rutan i mitten måste vara ${sym === 'X' ? 'O' : 'X'}.` };
+          }
+        }
+      }
+
+      // 3. Dubbelpar eller sandwich i kolumn
+      for (let c = 0; c < N; c++) {
+        for (let r = 0; r < N; r++) {
+          if (r <= N - 3 && userGrid[r][c] !== -1 && userGrid[r][c] === userGrid[r + 1][c] && userGrid[r + 2][c] === -1) {
+            const sym = userGrid[r][c] === 1 ? 'X' : 'O';
+            return { r: r + 2, c, reason: `Två ${sym} i rad i kolumn ${c + 1} – rutan under måste vara ${sym === 'X' ? 'O' : 'X'}.` };
+          }
+          if (r >= 2 && userGrid[r][c] !== -1 && userGrid[r][c] === userGrid[r - 1][c] && userGrid[r - 2][c] === -1) {
+            const sym = userGrid[r][c] === 1 ? 'X' : 'O';
+            return { r: r - 2, c, reason: `Två ${sym} i rad i kolumn ${c + 1} – rutan ovanför måste vara ${sym === 'X' ? 'O' : 'X'}.` };
+          }
+          if (r <= N - 3 && userGrid[r][c] !== -1 && userGrid[r][c] === userGrid[r + 2][c] && userGrid[r + 1][c] === -1) {
+            const sym = userGrid[r][c] === 1 ? 'X' : 'O';
+            return { r: r + 1, c, reason: `Sandwich (${sym}_${sym}) i kolumn ${c + 1} – rutan i mitten måste vara ${sym === 'X' ? 'O' : 'X'}.` };
+          }
+        }
+      }
+
+      // 4. Full kvot i rad eller kolumn
+      for (let r = 0; r < N; r++) {
+        let c0 = 0, c1 = 0;
+        for (let c = 0; c < N; c++) {
+          if (userGrid[r][c] === 0) c0++;
+          else if (userGrid[r][c] === 1) c1++;
+        }
+        if ((c0 === half || c1 === half) && c0 + c1 < N) {
+          const targetC = userGrid[r].indexOf(-1);
+          const fullSym = c1 === half ? 'X' : 'O';
+          return { r, c: targetC, reason: `Rad ${r + 1} har redan ${half} st ${fullSym} – resten av raden ska vara ${fullSym === 'X' ? 'O' : 'X'}.` };
+        }
+      }
+
+      for (let c = 0; c < N; c++) {
+        let c0 = 0, c1 = 0, emptyR = -1;
+        for (let r = 0; r < N; r++) {
+          if (userGrid[r][c] === 0) c0++;
+          else if (userGrid[r][c] === 1) c1++;
+          else if (emptyR === -1) emptyR = r;
+        }
+        if ((c0 === half || c1 === half) && emptyR !== -1) {
+          const fullSym = c1 === half ? 'X' : 'O';
+          return { r: emptyR, c, reason: `Kolumn ${c + 1} har redan ${half} st ${fullSym} – resten av kolumnen ska vara ${fullSym === 'X' ? 'O' : 'X'}.` };
+        }
+      }
+
+      // 5. Fallback: Första tomma ruta
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          if (userGrid[r][c] === -1) {
+            const sym = solutionGrid[r][c] === 1 ? 'X' : 'O';
+            return { r, c, reason: `Logisk uteslutning på rad ${r + 1}, kolumn ${c + 1} ger ${sym}.` };
+          }
+        }
+      }
+      return null;
+    }
+
+    /**
+     * Kontroll av entydighet (avbryter vid 2 lösningar).
+     */
+    function countSolutions(board, N, limit = 2) {
+      const half = N / 2;
       let count = 0;
 
       function backtrack(grid) {
         if (count >= limit) return;
 
-        const easy = solveEasy(grid);
-        const g = easy.grid;
+        const stepped = solveLogical(grid, N, 'easy');
+        const g = stepped.grid;
 
-        // Kontrollera om rad/kolumn brutit reglerna
-        for (let r = 0; r < 12; r++) {
-          let count0 = 0, count1 = 0;
-          for (let c = 0; c < 12; c++) {
+        for (let r = 0; r < N; r++) {
+          let c0 = 0, c1 = 0;
+          for (let c = 0; c < N; c++) {
             const v = g[r][c];
-            if (v === 0) count0++;
-            if (v === 1) count1++;
-            if (c <= 9 && v !== -1 && v === g[r][c + 1] && v === g[r][c + 2]) return;
+            if (v === 0) c0++;
+            else if (v === 1) c1++;
+            if (c <= N - 3 && v !== -1 && v === g[r][c + 1] && v === g[r][c + 2]) return;
           }
-          if (count0 > 6 || count1 > 6) return;
+          if (c0 > half || c1 > half) return;
         }
 
-        for (let c = 0; c < 12; c++) {
-          let count0 = 0, count1 = 0;
-          for (let r = 0; r < 12; r++) {
+        for (let c = 0; c < N; c++) {
+          let c0 = 0, c1 = 0;
+          for (let r = 0; r < N; r++) {
             const v = g[r][c];
-            if (v === 0) count0++;
-            if (v === 1) count1++;
-            if (r <= 9 && v !== -1 && v === g[r + 1][c] && v === g[r + 2][c]) return;
+            if (v === 0) c0++;
+            else if (v === 1) c1++;
+            if (r <= N - 3 && v !== -1 && v === g[r + 1][c] && v === g[r + 2][c]) return;
           }
-          if (count0 > 6 || count1 > 6) return;
+          if (c0 > half || c1 > half) return;
         }
 
-        if (easy.solved) {
-          // Kontrollera att alla rader och kolumner är unika
+        if (stepped.solved) {
           const rowStrs = new Set();
-          for (let r = 0; r < 12; r++) {
+          for (let r = 0; r < N; r++) {
             const s = g[r].join('');
             if (rowStrs.has(s)) return;
             rowStrs.add(s);
           }
           const colStrs = new Set();
-          for (let c = 0; c < 12; c++) {
+          for (let c = 0; c < N; c++) {
             let s = '';
-            for (let r = 0; r < 12; r++) s += g[r][c];
+            for (let r = 0; r < N; r++) s += g[r][c];
             if (colStrs.has(s)) return;
             colStrs.add(s);
           }
-
           count++;
           return;
         }
 
-        // Hitta den mest begränsade tomma rutan
+        // Välj den mest begränsade tomma rutan
         let bestR = -1, bestC = -1, maxFilled = -1;
-        for (let r = 0; r < 12; r++) {
-          for (let c = 0; c < 12; c++) {
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) {
             if (g[r][c] === -1) {
               let filled = 0;
-              for (let k = 0; k < 12; k++) {
+              for (let k = 0; k < N; k++) {
                 if (g[r][k] !== -1) filled++;
                 if (g[k][c] !== -1) filled++;
               }
@@ -719,23 +971,26 @@
       backtrack(board);
       return count;
     }
-    function createPuzzleByDifficulty(diff) {
-      const fullSolution = generateRandomFullBoard();
-      const puzzle = fullSolution.map(row => [...row]);
 
-      // Slumpmässig ordning över alla 144 rutor
+    function createPuzzleByDifficulty(diff, N) {
+      const fullSolution = generateRandomFullBoard(N);
+      const puzzle = fullSolution.map(row => [...row]);
+      const totalCells = N * N;
+
       const positions = [];
-      for (let r = 0; r < 12; r++) {
-        for (let c = 0; c < 12; c++) {
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
           positions.push({ r, c });
         }
       }
-      positions.sort(() => Math.random() - 0.5);
+      shuffleArray(positions);
 
-      let cluesRemaining = 144;
-      let targetMinClues = 54; // Lätt: ~52-58 ledtrådar
-      if (diff === 'medium') targetMinClues = 44; // Medel: ~42-46
-      if (diff === 'hard') targetMinClues = 36;   // Svår: ~34-38
+      let cluesRemaining = totalCells;
+      // Målandel ledtrådar beroende på svårighetsgrad
+      let ratio = 0.39; // Lätt (~39% av rutorna)
+      if (diff === 'medium') ratio = 0.31;
+      if (diff === 'hard') ratio = 0.25;
+      const targetMinClues = Math.max(N + 2, Math.round(totalCells * ratio));
 
       for (const { r, c } of positions) {
         if (cluesRemaining <= targetMinClues) break;
@@ -744,14 +999,12 @@
         puzzle[r][c] = -1;
 
         let canRemove = false;
-
         if (diff === 'easy') {
-          // Lätt: Kräver 100% direkt lösbarhet enbart med enkla regler
-          const res = solveEasy(puzzle);
-          canRemove = res.solved;
+          canRemove = solveLogical(puzzle, N, 'easy').solved;
+        } else if (diff === 'medium') {
+          canRemove = solveLogical(puzzle, N, 'medium').solved;
         } else {
-          // Medel och Svår: Garanterat entydig och unik lösning
-          canRemove = countSolutions(puzzle, 2) === 1;
+          canRemove = countSolutions(puzzle, N, 2) === 1;
         }
 
         if (canRemove) {
@@ -769,6 +1022,84 @@
       };
     }
 
+    /**
+     * Uppdaterar CSS-variabler för layout, brädstorlek och textstorlek (gäller både skärm & print).
+     */
+    function applyLayoutVariables() {
+      const preset = LAYOUT_PRESETS[state.perPage] || LAYOUT_PRESETS[4];
+      const N = state.gridDim;
+      const scaledMm = +(preset.baseMm * (state.scalePercent / 100)).toFixed(1);
+      const cellMm = scaledMm / N;
+      const fontMm = +(cellMm * 0.66).toFixed(2);
+
+      const root = document.documentElement.style;
+      root.setProperty('--grid-dim', N);
+      root.setProperty('--page-cols', preset.cols);
+      root.setProperty('--page-rows', preset.rows);
+      root.setProperty('--board-size', `${scaledMm}mm`);
+      root.setProperty('--cell-font-size', `${fontMm}mm`);
+      root.setProperty('--card-title-size', `${preset.titlePt}pt`);
+      root.setProperty('--page-gap-y', preset.gapY);
+      root.setProperty('--page-gap-x', preset.gapX);
+
+      // Uppdatera etiketter i UI
+      const scaleLabel = document.getElementById('scale-label');
+      if (scaleLabel) {
+        scaleLabel.textContent = `${state.scalePercent}% (${Math.round(scaledMm)}mm)`;
+      }
+      const headerTitle = document.getElementById('header-title-text');
+      if (headerTitle) {
+        headerTitle.textContent = `Tic-Tac-Logic ${N}×${N}`;
+      }
+      const headerSub = document.getElementById('header-subtitle');
+      if (headerSub) {
+        headerSub.textContent = `${state.perPage} pussel per A4 (${preset.cols}×${preset.rows}) • ${Math.round(scaledMm)} mm bräden`;
+      }
+
+      updateSheetsDropdownLabels();
+    }
+
+    function updateSheetsDropdownLabels() {
+      const select = document.getElementById('sheets-select');
+      if (!select) return;
+      Array.from(select.options).forEach(opt => {
+        const sheets = parseInt(opt.value);
+        const total = sheets * state.perPage;
+        opt.textContent = `${sheets} A4-ark (${total} pussel)`;
+      });
+      select.value = String(state.sheetsCount);
+    }
+
+    function saveStateToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignorera om localStorage är blockerat
+      }
+    }
+
+    function loadStateFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.puzzles) || parsed.puzzles.length === 0) return false;
+
+        Object.assign(state, parsed);
+        document.getElementById('grid-size-select').value = String(state.gridDim);
+        document.getElementById('per-page-select').value = String(state.perPage);
+        document.getElementById('scale-slider').value = String(state.scalePercent);
+        document.getElementById('check-solutions').checked = !!state.includeSolutions;
+        document.getElementById('check-rules-strip').checked = !!state.showRulesStrip;
+        syncDifficultyButtonsUI(state.difficulty);
+        applyLayoutVariables();
+        renderPages();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
     function generateAllPuzzles() {
       const btn = document.getElementById('btn-generate');
       const origText = btn.innerHTML;
@@ -776,9 +1107,11 @@
       btn.disabled = true;
 
       setTimeout(() => {
+        const totalNeeded = state.perPage * state.sheetsCount;
         state.puzzles = [];
-        for (let i = 0; i < state.count; i++) {
-          const pData = createPuzzleByDifficulty(state.difficulty);
+
+        for (let i = 0; i < totalNeeded; i++) {
+          const pData = createPuzzleByDifficulty(state.difficulty, state.gridDim);
           state.puzzles.push({
             id: i + 1,
             initialGrid: pData.initialGrid,
@@ -788,60 +1121,71 @@
             showSolution: false
           });
         }
+
+        applyLayoutVariables();
         renderPages();
+        saveStateToStorage();
+
         btn.innerHTML = origText;
         btn.disabled = false;
 
         const diffLabel = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }[state.difficulty];
-        showToast(`🎉 ${state.count} st nya pussel (${diffLabel}) klara!`, '✨');
-      }, 40);
+        showToast(`🎉 ${totalNeeded} st nya ${state.gridDim}×${state.gridDim}-pussel (${diffLabel}) klara!`, '✨');
+      }, 30);
     }
+
     function renderPages() {
       const container = document.getElementById('pages-container');
       container.innerHTML = '';
 
-      const puzzlesPerPage = 4; // Fast optimerat för 4 per A4
+      const N = state.gridDim;
+      const half = N / 2;
+      const puzzlesPerPage = state.perPage;
       const totalPuzzles = state.puzzles.length;
-      const totalPages = Math.ceil(totalPuzzles / puzzlesPerPage);
+      const puzzlePagesCount = Math.ceil(totalPuzzles / puzzlesPerPage);
+
+      const solutionsPerPage = 12; // Max 12 facit per A4-sida så de aldrig klipps
+      const solPagesCount = state.includeSolutions ? Math.ceil(totalPuzzles / solutionsPerPage) : 0;
+      const totalAllPages = puzzlePagesCount + solPagesCount;
+
       const diffSwedish = { easy: 'Lätt', medium: 'Medel', hard: 'Svår' }[state.difficulty];
 
-      // 1. Skapa pusselsidor (4 per ark)
-      for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+      // 1. Skapa pusselsidor
+      for (let pageIdx = 0; pageIdx < puzzlePagesCount; pageIdx++) {
         const start = pageIdx * puzzlesPerPage;
         const pagePuzzles = state.puzzles.slice(start, start + puzzlesPerPage);
 
         const pageEl = document.createElement('section');
         pageEl.className = 'a4-page';
 
-        // Ultrakompakt sidhuvud för minimalt höjdspill
         let headerHtml = '';
         if (state.showRulesStrip) {
           headerHtml = `
-            <div class="w-full pb-1 mb-1 border-b-2 border-slate-900 flex items-center justify-between text-slate-900 leading-none">
+            <div class="w-full pb-1 mb-1.5 border-b-2 border-slate-900 flex items-center justify-between text-slate-900 leading-none shrink-0">
               <div class="flex items-center gap-2">
-                <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight">XO TIC-TAC-LOGIC 12×12</span>
+                <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight">XO TIC-TAC-LOGIC ${N}×${N}</span>
                 <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-slate-200 text-slate-800">${diffSwedish}</span>
               </div>
               <div class="text-[10px] sm:text-[11px] font-medium text-slate-700 hidden sm:block">
-                Regler: Max 2 i rad • Exakt sex X & sex O per linje • Alla rader & kolumner är unika
+                Regler: Max 2 lika i rad • Exakt ${half} X & ${half} O per rad/kolumn • Alla rader & kolumner unika
               </div>
               <div class="text-[10.5px] font-mono font-semibold text-slate-600">
-                Sida ${pageIdx + 1} av ${totalPages + (state.includeSolutions ? 1 : 0)}
+                Sida ${pageIdx + 1} av ${totalAllPages}
               </div>
             </div>
           `;
         } else {
           headerHtml = `
-            <div class="w-full pb-1 mb-1 border-b border-slate-300 flex items-center justify-between text-slate-600 font-mono text-[10.5px]">
-              <span>Tic-Tac-Logic 12×12 (${diffSwedish})</span>
-              <span>Sida ${pageIdx + 1}</span>
+            <div class="w-full pb-1 mb-1 border-b border-slate-300 flex items-center justify-between text-slate-600 font-mono text-[10.5px] shrink-0">
+              <span>Tic-Tac-Logic ${N}×${N} (${diffSwedish})</span>
+              <span>Sida ${pageIdx + 1} av ${totalAllPages}</span>
             </div>
           `;
         }
 
-        let puzzlesHtml = `<div class="print-grid-4 flex-1">`;
+        let puzzlesHtml = `<div class="puzzle-page-grid">`;
         pagePuzzles.forEach(puzzle => {
-          puzzlesHtml += renderPuzzleCard(puzzle);
+          puzzlesHtml += renderPuzzleCard(puzzle, N);
         });
         puzzlesHtml += `</div>`;
 
@@ -849,44 +1193,47 @@
         container.appendChild(pageEl);
       }
 
-      // 2. Skapa separat facitsida om ikryssad
-      if (state.includeSolutions && state.puzzles.length > 0) {
-        const solPageEl = document.createElement('section');
-        solPageEl.className = 'a4-page';
+      // 2. Skapa paginerade facitsidor om ikryssat
+      if (state.includeSolutions && totalPuzzles > 0) {
+        for (let sPage = 0; sPage < solPagesCount; sPage++) {
+          const start = sPage * solutionsPerPage;
+          const pageSols = state.puzzles.slice(start, start + solutionsPerPage);
 
-        const solHeaderHtml = `
-          <div class="w-full pb-1 mb-2 border-b-2 border-slate-900 flex items-center justify-between text-slate-900">
-            <div class="flex items-center gap-2">
-              <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight">FACIT / LÖSNINGAR – TIC-TAC-LOGIC 12×12</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-slate-200 text-slate-800">${diffSwedish}</span>
+          const solPageEl = document.createElement('section');
+          solPageEl.className = 'a4-page';
+
+          const pageNum = puzzlePagesCount + sPage + 1;
+          const solHeaderHtml = `
+            <div class="w-full pb-1 mb-2 border-b-2 border-slate-900 flex items-center justify-between text-slate-900 shrink-0">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight">FACIT / LÖSNINGAR – TIC-TAC-LOGIC ${N}×${N}</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-slate-200 text-slate-800">${diffSwedish}</span>
+              </div>
+              <span class="text-[10.5px] font-mono font-semibold text-slate-600">
+                Sida ${pageNum} av ${totalAllPages}
+              </span>
             </div>
-            <span class="text-[10.5px] font-mono text-slate-600">Lösningsbilaga</span>
-          </div>
-        `;
+          `;
 
-        const solCols = state.puzzles.length > 4 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2';
-        let solCardsHtml = `<div class="flex-1 grid ${solCols} gap-4 items-center justify-center py-2">`;
-        state.puzzles.forEach(puzzle => {
-          solCardsHtml += renderSolutionThumbnail(puzzle);
-        });
-        solCardsHtml += `</div>`;
+          let solCardsHtml = `<div class="sol-page-grid">`;
+          pageSols.forEach(puzzle => {
+            solCardsHtml += renderSolutionThumbnail(puzzle, N);
+          });
+          solCardsHtml += `</div>`;
 
-        solPageEl.innerHTML = solHeaderHtml + solCardsHtml;
-        container.appendChild(solPageEl);
+          solPageEl.innerHTML = solHeaderHtml + solCardsHtml;
+          container.appendChild(solPageEl);
+        }
       }
     }
-    /**
-     * Renderar ett pusselbräde.
-     * OBSERVERA: Alla inre linjer är helt jämna och tunna (1px).
-     * Endast den yttre kanten runt 12x12-brädet är kraftig (2.5px solid #000).
-     */
-    function renderPuzzleCard(puzzle) {
+
+    function renderPuzzleCard(puzzle, N) {
       const isShowingSol = puzzle.showSolution;
       const displayGrid = isShowingSol ? puzzle.solutionGrid : puzzle.userGrid;
 
       let cellsHtml = '';
-      for (let r = 0; r < 12; r++) {
-        for (let c = 0; c < 12; c++) {
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
           const isInitial = puzzle.initialGrid[r][c] !== -1;
           const val = displayGrid[r][c];
           const isDarkSquare = (r + c) % 2 === 1;
@@ -895,13 +1242,11 @@
           if (val === 1) char = 'X';
           else if (val === 0) char = 'O';
 
-          // Helt jämna inre linjer (inga tjocka stödlinjer inuti).
-          // Ytterkanten (c === 11 eller r === 11) har ingen inre kant för att inte dubblera ytterramen.
-          const borderRight = (c === 11) ? 'cell-right-edge' : 'border-r border-slate-300';
-          const borderBottom = (r === 11) ? 'cell-bottom-edge' : 'border-b border-slate-300';
-          const checkerBg = isDarkSquare ? 'cell-dark bg-slate-100/90' : 'cell-light bg-white';
+          const borderRight = (c === N - 1) ? 'cell-right-edge' : '';
+          const borderBottom = (r === N - 1) ? 'cell-bottom-edge' : '';
+          const checkerBg = isDarkSquare ? 'cell-dark' : 'cell-light';
 
-          let cellClass = `cell w-6 h-6 sm:w-7 sm:h-7 text-xs sm:text-sm ${borderRight} ${borderBottom} ${checkerBg} font-symbol flex items-center justify-center select-none relative focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:z-10 transition-colors `;
+          let cellClass = `cell ${borderRight} ${borderBottom} ${checkerBg} font-symbol select-none relative focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:z-10 transition-colors `;
 
           if (isInitial) {
             cellClass += 'print-cell-initial text-slate-950 font-black cursor-default';
@@ -922,53 +1267,54 @@
               tabindex="0"
               onkeydown="handleCellKeyDown(event, ${puzzle.id}, ${r}, ${c})"
               class="${cellClass}"
-            >
-              ${char}
-            </div>
+            >${char}</div>
           `;
         }
       }
 
       return `
-        <div class="print-board-card-4 max-w-[360px] w-full flex flex-col items-center">
-          <div class="w-full flex items-center justify-between mb-1 px-0.5">
-            <span class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
-              Pussel #${puzzle.id}
-              <span class="text-[10px] font-normal text-slate-500 ml-1">(${puzzle.cluesCount} ledtrådar)</span>
+        <div class="board-card">
+          <div class="board-card-header">
+            <span class="font-bold text-slate-900 tracking-tight">
+              #${puzzle.id}
+              <span class="font-normal text-slate-500 opacity-80">(${puzzle.cluesCount})</span>
             </span>
 
             <div class="no-print flex items-center gap-1">
-              <button onclick="togglePuzzleSolution(${puzzle.id})" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium transition cursor-pointer">
-                ${isShowingSol ? 'Dölj facit' : 'Facit'}
+              <button onclick="givePuzzleHint(${puzzle.id})" class="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-medium transition cursor-pointer" title="Visa nästa logiska drag">
+                💡 Ledtråd
               </button>
-              <button onclick="resetPuzzleUserGrid(${puzzle.id})" class="text-[11px] px-1.5 py-0.5 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Rensa ifyllda rutor">
-                Rensa
+              <button onclick="togglePuzzleSolution(${puzzle.id})" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium transition cursor-pointer">
+                ${isShowingSol ? 'Dölj' : 'Facit'}
+              </button>
+              <button onclick="resetPuzzleUserGrid(${puzzle.id})" class="text-[10px] px-1 py-0.5 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Rensa ifyllda rutor">
+                ✕
               </button>
             </div>
           </div>
 
-          <!-- Ytterkant: Fet 2.5px solid #000 runt hela brädet -->
-          <div class="print-board-grid-4 inline-grid grid-cols-12 border-[2.5px] border-slate-900 bg-white shadow-xs">
+          <div class="board-grid shadow-sm">
             ${cellsHtml}
           </div>
         </div>
       `;
     }
 
-    function renderSolutionThumbnail(puzzle) {
+    function renderSolutionThumbnail(puzzle, N) {
       let cellsHtml = '';
-      for (let r = 0; r < 12; r++) {
-        for (let c = 0; c < 12; c++) {
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
           const val = puzzle.solutionGrid[r][c];
+          const isInitial = puzzle.initialGrid[r][c] !== -1;
           const char = val === 1 ? 'X' : 'O';
           const isDarkSquare = (r + c) % 2 === 1;
-          const bgClass = isDarkSquare ? 'cell-dark bg-slate-100' : 'cell-light bg-white';
-          const borderRight = (c === 11) ? '' : 'border-r border-slate-200';
-          const borderBottom = (r === 11) ? '' : 'border-b border-slate-200';
-          const charColor = val === 1 ? 'text-slate-900 font-bold' : 'text-slate-600 font-medium';
+          const bgClass = isDarkSquare ? 'cell-dark' : 'cell-light';
+          const borderRight = (c === N - 1) ? 'cell-right-edge' : '';
+          const borderBottom = (r === N - 1) ? 'cell-bottom-edge' : '';
+          const weightClass = isInitial ? 'text-black font-black' : 'text-slate-600 font-medium';
 
           cellsHtml += `
-            <div class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[9px] sm:text-[10px] ${borderRight} ${borderBottom} ${bgClass} ${charColor} font-symbol flex items-center justify-center">
+            <div class="sol-cell ${borderRight} ${borderBottom} ${bgClass} ${weightClass} font-symbol">
               ${char}
             </div>
           `;
@@ -976,17 +1322,18 @@
       }
 
       return `
-        <div class="flex flex-col items-center p-2 rounded-lg border border-slate-300 bg-slate-50/50">
-          <span class="text-xs font-bold text-slate-800 mb-1">Facit: Pussel #${puzzle.id}</span>
-          <div class="inline-grid grid-cols-12 border-2 border-slate-900 bg-white shadow-xs">
+        <div class="flex flex-col items-center p-1.5 rounded-lg border border-slate-300 bg-slate-50/50">
+          <span class="text-[10px] font-bold text-slate-800 mb-1">Facit #${puzzle.id}</span>
+          <div class="sol-grid">
             ${cellsHtml}
           </div>
         </div>
       `;
     }
+
     function handleCellClick(puzzleId, r, c) {
       const puzzle = state.puzzles.find(p => p.id === puzzleId);
-      if (!puzzle || puzzle.initialGrid[r][c] !== -1) return;
+      if (!puzzle || puzzle.showSolution || puzzle.initialGrid[r][c] !== -1) return;
 
       const current = puzzle.userGrid[r][c];
       let nextVal = -1;
@@ -997,12 +1344,13 @@
       puzzle.userGrid[r][c] = nextVal;
       updateCellDisplay(puzzleId, r, c, nextVal, false);
       checkImmediateAdjacency(puzzleId, r, c);
+      saveStateToStorage();
     }
 
     function handleCellRightClick(e, puzzleId, r, c) {
       e.preventDefault();
       const puzzle = state.puzzles.find(p => p.id === puzzleId);
-      if (!puzzle || puzzle.initialGrid[r][c] !== -1) return;
+      if (!puzzle || puzzle.showSolution || puzzle.initialGrid[r][c] !== -1) return;
 
       const current = puzzle.userGrid[r][c];
       let nextVal = -1;
@@ -1013,19 +1361,20 @@
       puzzle.userGrid[r][c] = nextVal;
       updateCellDisplay(puzzleId, r, c, nextVal, false);
       checkImmediateAdjacency(puzzleId, r, c);
+      saveStateToStorage();
     }
 
     function handleCellKeyDown(e, puzzleId, r, c) {
       const puzzle = state.puzzles.find(p => p.id === puzzleId);
       if (!puzzle) return;
+      const N = state.gridDim;
 
-      // Tangentbordsnavigering
       if (e.key === 'ArrowUp' && r > 0) {
         document.getElementById(`cell-${puzzleId}-${r - 1}-${c}`)?.focus();
         e.preventDefault();
         return;
       }
-      if (e.key === 'ArrowDown' && r < 11) {
+      if (e.key === 'ArrowDown' && r < N - 1) {
         document.getElementById(`cell-${puzzleId}-${r + 1}-${c}`)?.focus();
         e.preventDefault();
         return;
@@ -1035,26 +1384,31 @@
         e.preventDefault();
         return;
       }
-      if (e.key === 'ArrowRight' && c < 11) {
+      if (e.key === 'ArrowRight' && c < N - 1) {
         document.getElementById(`cell-${puzzleId}-${r}-${c + 1}`)?.focus();
         e.preventDefault();
         return;
       }
 
-      if (puzzle.initialGrid[r][c] !== -1) return;
+      if (puzzle.showSolution || puzzle.initialGrid[r][c] !== -1) return;
 
       const key = e.key.toUpperCase();
       if (key === 'X') {
         puzzle.userGrid[r][c] = 1;
         updateCellDisplay(puzzleId, r, c, 1, false);
+        checkImmediateAdjacency(puzzleId, r, c);
+        saveStateToStorage();
         e.preventDefault();
       } else if (key === 'O' || key === '0') {
         puzzle.userGrid[r][c] = 0;
         updateCellDisplay(puzzleId, r, c, 0, false);
+        checkImmediateAdjacency(puzzleId, r, c);
+        saveStateToStorage();
         e.preventDefault();
       } else if (e.key === 'Backspace' || e.key === 'Delete') {
         puzzle.userGrid[r][c] = -1;
         updateCellDisplay(puzzleId, r, c, -1, false);
+        saveStateToStorage();
         e.preventDefault();
       } else if (e.key === ' ' || e.key === 'Spacebar') {
         handleCellClick(puzzleId, r, c);
@@ -1062,7 +1416,7 @@
       }
     }
 
-    function updateCellDisplay(puzzleId, r, c, val, isError) {
+    function updateCellDisplay(puzzleId, r, c, val, isError, isHint = false) {
       const cell = document.getElementById(`cell-${puzzleId}-${r}-${c}`);
       if (!cell) return;
 
@@ -1071,41 +1425,79 @@
       else if (val === 0) char = 'O';
 
       cell.textContent = char;
-      cell.classList.remove('text-indigo-600', 'text-rose-600', 'bg-rose-100', 'text-rose-700');
+      cell.classList.remove(
+        'text-indigo-600', 'text-rose-600',
+        'bg-rose-100', 'text-rose-700',
+        'ring-2', 'ring-amber-400', 'bg-amber-50'
+      );
 
-      if (val === 1) cell.classList.add('text-indigo-600');
-      else if (val === 0) cell.classList.add('text-rose-600');
+      if (val === 1) cell.classList.add('text-indigo-600', 'font-bold');
+      else if (val === 0) cell.classList.add('text-rose-600', 'font-bold');
 
       if (isError) cell.classList.add('bg-rose-100', 'text-rose-700');
+      if (isHint) cell.classList.add('ring-2', 'ring-amber-400', 'bg-amber-50');
     }
 
     function checkImmediateAdjacency(puzzleId, r, c) {
       const puzzle = state.puzzles.find(p => p.id === puzzleId);
       if (!puzzle) return;
       const g = puzzle.userGrid;
+      const N = state.gridDim;
+      const half = N / 2;
 
-      // Horisontell 3 i rad
-      for (let j = 0; j <= 9; j++) {
-        if (g[r][j] !== -1 && g[r][j] === g[r][j+1] && g[r][j] === g[r][j+2]) {
-          showToast('⚠️ Obs: Högst två likadana symboler intill varandra!', '⚠️');
+      // Kontrollera 3 i rad vågrätt
+      for (let j = 0; j <= N - 3; j++) {
+        if (g[r][j] !== -1 && g[r][j] === g[r][j + 1] && g[r][j] === g[r][j + 2]) {
+          showToast('⚠️ Obs: Högst två likadana symboler i rad vågrätt!', '⚠️');
           return;
         }
       }
-      // Vertikal 3 i rad
-      for (let i = 0; i <= 9; i++) {
-        if (g[i][c] !== -1 && g[i][c] === g[i+1][c] && g[i][c] === g[i+2][c]) {
-          showToast('⚠️ Obs: Högst två likadana symboler i kolumnen!', '⚠️');
+      // Kontrollera 3 i rad lodrätt
+      for (let i = 0; i <= N - 3; i++) {
+        if (g[i][c] !== -1 && g[i][c] === g[i + 1][c] && g[i][c] === g[i + 2][c]) {
+          showToast('⚠️ Obs: Högst två likadana symboler i rad lodrätt!', '⚠️');
           return;
         }
+      }
+      // Kontrollera för många X eller O i raden/kolumnen
+      let r0 = 0, r1 = 0, c0 = 0, c1 = 0;
+      for (let k = 0; k < N; k++) {
+        if (g[r][k] === 0) r0++; else if (g[r][k] === 1) r1++;
+        if (g[k][c] === 0) c0++; else if (g[k][c] === 1) c1++;
+      }
+      if (r0 > half || r1 > half) {
+        showToast(`⚠️ Obs: Rad ${r + 1} har fler än ${half} av samma symbol!`, '⚠️');
+      } else if (c0 > half || c1 > half) {
+        showToast(`⚠️ Obs: Kolumn ${c + 1} har fler än ${half} av samma symbol!`, '⚠️');
       }
     }
+
+    function givePuzzleHint(puzzleId) {
+      const puzzle = state.puzzles.find(p => p.id === puzzleId);
+      if (!puzzle || puzzle.showSolution) return;
+
+      const hint = findNextHint(puzzle.userGrid, puzzle.solutionGrid, state.gridDim);
+      if (!hint) {
+        showToast(`Pussel #${puzzleId} är redan helt löst! 🏆`, '⭐');
+        return;
+      }
+
+      const cell = document.getElementById(`cell-${puzzleId}-${hint.r}-${hint.c}`);
+      if (cell) {
+        cell.focus();
+        updateCellDisplay(puzzleId, hint.r, hint.c, puzzle.userGrid[hint.r][hint.c], false, true);
+      }
+      showToast(`💡 #${puzzleId}: ${hint.reason}`, '💡');
+    }
+
     function checkAllPuzzles() {
       let mistakes = 0;
       let uncompleted = 0;
+      const N = state.gridDim;
 
       state.puzzles.forEach(puzzle => {
-        for (let r = 0; r < 12; r++) {
-          for (let c = 0; c < 12; c++) {
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) {
             const userVal = puzzle.userGrid[r][c];
             const correctVal = puzzle.solutionGrid[r][c];
             if (userVal === -1) {
@@ -1140,6 +1532,7 @@
       puzzle.userGrid = puzzle.initialGrid.map(row => [...row]);
       puzzle.showSolution = false;
       renderPages();
+      saveStateToStorage();
       showToast(`Pussel #${puzzleId} rensat.`, '🔄');
     }
 
@@ -1149,13 +1542,11 @@
         p.showSolution = false;
       });
       renderPages();
+      saveStateToStorage();
       showToast('Alla dina ifyllda rutor har återställts.', '🔄');
     }
 
-    function setDifficulty(newDiff) {
-      if (state.difficulty === newDiff) return;
-      state.difficulty = newDiff;
-
+    function syncDifficultyButtonsUI(diff) {
       const btnEasy = document.getElementById('diff-easy');
       const btnMed = document.getElementById('diff-medium');
       const btnHard = document.getElementById('diff-hard');
@@ -1166,49 +1557,87 @@
         b.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-600 hover:text-slate-900 cursor-pointer';
       });
 
-      if (newDiff === 'easy') {
-        btnEasy.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-emerald-700 shadow-xs cursor-pointer';
+      if (diff === 'easy') {
+        btnEasy.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-emerald-700 shadow-sm cursor-pointer';
         badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200';
         badge.textContent = 'Lätt nivå';
         pill.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
-        pill.textContent = 'Lätt nivå (~52–58 ledtrådar, 100% direkt lösbart)';
-      } else if (newDiff === 'medium') {
-        btnMed.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-amber-700 shadow-xs cursor-pointer';
+        pill.textContent = 'Lätt nivå (100% direkt lösbart med enkla regler)';
+      } else if (diff === 'medium') {
+        btnMed.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-amber-700 shadow-sm cursor-pointer';
         badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full border bg-amber-100 text-amber-800 border-amber-200';
         badge.textContent = 'Medel nivå';
         pill.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200';
-        pill.textContent = 'Medel nivå (~42–46 ledtrådar, radjämförelser)';
-      } else if (newDiff === 'hard') {
-        btnHard.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-rose-700 shadow-xs cursor-pointer';
+        pill.textContent = 'Medel nivå (kräver radjämförelser och uteslutning)';
+      } else if (diff === 'hard') {
+        btnHard.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-white text-rose-700 shadow-sm cursor-pointer';
         badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full border bg-rose-100 text-rose-800 border-rose-200';
         badge.textContent = 'Svår nivå';
         pill.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200';
-        pill.textContent = 'Svår nivå (~34–38 ledtrådar, få ledtrådar & djupare logik)';
+        pill.textContent = 'Svår nivå (få ledtrådar & djupare logiska kedjor)';
+      }
+    }
+
+    function setDifficulty(newDiff) {
+      if (state.difficulty === newDiff) return;
+      state.difficulty = newDiff;
+      syncDifficultyButtonsUI(newDiff);
+      generateAllPuzzles();
+    }
+
+    function changeGridDimension(newDim) {
+      if (state.gridDim === newDim) return;
+      state.gridDim = newDim;
+      generateAllPuzzles();
+    }
+
+    function changePuzzlesPerPage(newPerPage) {
+      state.perPage = newPerPage;
+      const totalNeeded = state.perPage * state.sheetsCount;
+
+      // Om vi behöver fler pussel än vad som redan finns i listan, generera de som saknas
+      while (state.puzzles.length < totalNeeded) {
+        const pData = createPuzzleByDifficulty(state.difficulty, state.gridDim);
+        state.puzzles.push({
+          id: state.puzzles.length + 1,
+          initialGrid: pData.initialGrid,
+          userGrid: pData.userGrid,
+          solutionGrid: pData.solutionGrid,
+          cluesCount: pData.cluesCount,
+          showSolution: false
+        });
+      }
+      if (state.puzzles.length > totalNeeded) {
+        state.puzzles = state.puzzles.slice(0, totalNeeded);
       }
 
-      generateAllPuzzles();
-    }
-
-    function changeCount(newCount) {
-      state.count = newCount;
-      generateAllPuzzles();
-    }
-
-    function changePrintBoardSize(newSize) {
-      state.boardPrintSize = newSize;
-      document.documentElement.style.setProperty('--board-size-4print', newSize);
+      applyLayoutVariables();
       renderPages();
-      showToast(`Utskriftsstorlek satt till ${newSize}`, '📐');
+      saveStateToStorage();
+      showToast(`Layout ändrad till ${newPerPage} pussel per A4-sida`, '📐');
+    }
+
+    function changeSheetsCount(newSheets) {
+      state.sheetsCount = newSheets;
+      changePuzzlesPerPage(state.perPage);
+    }
+
+    function changeScalePercent(newPercent) {
+      state.scalePercent = newPercent;
+      applyLayoutVariables();
+      saveStateToStorage();
     }
 
     function toggleIncludeSolutions(val) {
       state.includeSolutions = val;
       renderPages();
+      saveStateToStorage();
     }
 
     function toggleRulesStrip(val) {
       state.showRulesStrip = val;
       renderPages();
+      saveStateToStorage();
     }
 
     function toggleRulesModal(show) {
@@ -1222,13 +1651,15 @@
       }
     }
 
+    let toastTimer = null;
     function showToast(msg, icon = 'ℹ️') {
       const toast = document.getElementById('toast');
       document.getElementById('toast-msg').textContent = msg;
       document.getElementById('toast-icon').textContent = icon;
       toast.classList.remove('translate-y-20', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3200);
@@ -1236,7 +1667,10 @@
 
     // Initiera vid laddning
     window.addEventListener('DOMContentLoaded', () => {
-      generateAllPuzzles();
+      if (!loadStateFromStorage()) {
+        applyLayoutVariables();
+        generateAllPuzzles();
+      }
     });
   </script>
 </body>
