@@ -1,0 +1,270 @@
+/**
+ * ORDLISTA FÖR SVENSKT TIDNINGSKRYSS (korsord-ordlista.js)
+ * Format: "ORD|Ledtråd" (får max vara 12 bokstäver, A-Ö)
+ */
+
+window.CROSSWORD_DATA = {
+  themes: {
+    klassisk: {
+      title: 'STORA SÖNDAGSKRYSSET',
+      subtitle: 'Klassiskt svenskt tidningskryss för kaffestunden',
+      label: 'Klassiskt Tidningskryss',
+      issueTag: 'FAMILJEBILAGA',
+      prizeWords: [
+        'KAFFERAST|Dagens viktigaste paus med dopp',
+        'SKÄRGÅRD|Klippor, kobbar och glittrande fjärdar',
+        'SOMMAREN|Årstiden vi längtar efter i nio månader',
+        'LÖSNINGEN|Belöningen när sista rutan är ifylld',
+        'HEMMALIV|Lugn och ro i den egna borgen'
+      ],
+      words: [
+        'KORSORD|Löser du just nu', 'TIDNING|Läses till kaffet', 'KAFFERAST|Paus med bulle',
+        'KANELBULLE|Snurrad till fikat', 'SOMMARSTUGA|Röd med vita knutar', 'SKÄRGÅRD|Tusentals öar',
+        'MIDSOMMAR|Sill i regnväder', 'SEMLOR|Äts på fettisdag', 'SEMLA|Bulle med mandel',
+        'FALUKORV|Röd ring i ugnen', 'KÖTTBULLAR|Rullas till jul', 'LINGONSYLT|Rött till husman',
+        'POTATIS|Kokas med dill', 'DANSBAND|Spelar på logen', 'DRAGSPEL|Bälg vid bryggan',
+        'FYRTORN|Blinkar vid kust', 'SEGELBÅT|Kryssar i fjärd', 'SOLSTOL|Fälls upp på strand',
+        'GLASSBIL|Spelar trudelutt', 'PLÅSTER|På skrubbsåret', 'PARASOLL|Ger skugga i sol',
+        'PARAPLY|Skydd mot skur', 'TRÄDGÅRD|Odlas med rabatt', 'GRÄSKLIPP|Doftar sommar',
+        'HAMMOCK|Gungar i skuggan', 'BOKHYLLA|Full av romaner', 'DECKARE|Spännande läsning',
+        'SMÖRGÅS|Bredda med ost', 'PANNKAKA|Med sylt och grädde', 'VÅFFLOR|Frasiga med hjortron',
+        'BRYGGAN|Ut i vattnet', 'METSPÖ|Med flöte och mask', 'CYKELTUR|Utflykt på två hjul',
+        'BLÅBÄR|Gör tungan blå', 'SMULTRON|Träs på grässtrå', ' HALLON|Röda på busken',
+        'RABARBER|Syrlig i pajen', 'SYRENER|Doftar i maj', 'TULPANER|Vårens snittblommor',
+        'STRANDEN|Sand mellan tårna', 'BADKRUKA|Doppar bara tån', 'Kikare|Spanar mot horisont',
+        'TERMOS|Håller kaffet varmt', 'RYGGSÄCK|Packad för utflykt', ' picknick|Mat på filt i gräset'
+      ]
+    },
+
+    skog: {
+      title: 'SKOGS- & BYGDEKRYSSET',
+      subtitle: 'Skoter, jakt, fiske, vedbod & riktig vinter',
+      label: 'Skog & Bygdeliv',
+      issueTag: 'FRILUFTSBILAGA',
+      prizeWords: [
+        'SKOTERLED|Snitslad väg över myr och fjäll',
+        'KOKKAFFET|Grytan som puttrar svart över öppen eld',
+        'ÄLGJAKTEN|Höstens viktigaste vecka i skogen',
+        'VEDBODEN|Bästa försäkringen inför smällkalla vintern',
+        'FJÄLLSJÖN|Där rödingen vakar i sommarkvällen'
+      ],
+      words: [
+        'SNÖSKOTER|Går över myren', 'SKOTER|Vinterfordon', 'ÄLGJAKT|Helig oktobervecka',
+        'RÖDING|Röd buk i fjällsjö', 'ABBORRE|Randig med taggar', 'GÄDDA|Lurar i vassen',
+        'KOKKAFFE|Svart över elden', 'TÄLJKNIV|Vass i slöjden', 'SLIDA|Hölster för kniv',
+        'VEDBOD|Full inför vintern', 'BJÖRKVED|Sprakar i kamin', 'MOTORSÅG|Fäller grov tall',
+        'RÖJSÅG|Tar klen sly', 'HJORTRON|Myrens guld', 'KANTARELL|Gul i mossan',
+        'ISBORR|Gör hål i isen', 'PIMPEL|Fiske på vårvinter', 'BASTU|Het efter vakbad',
+        'KALLBAD|Dopp i isvak', 'GRUSVÄG|Dammar på sommaren', 'SLÄPVAGN|Hängs på kroken',
+        'VINTERDÄCK|Dubbat på isgata', 'FJÄLLET|Blåsigt på toppen', 'MYGGOR|Surrar i juli',
+        'KNOTT|Små bitande kryp', 'KÅSA|Träkopp i bältet', 'PULKA|Dras bakom skoter',
+        'JAKTLAG|Samlas vid slaktbod', 'PASSKYTT|Sitter tyst i torn', 'ÄLGHUND|Skäller ståndskall',
+        'KAMIN|Värmer stugan', 'TÄNDVED|Tunna stickor', 'YXAN|Klyver kubben',
+        'TIMMER|Grova stockar', 'KALHYGGE|Öppet efter såg', 'SKOTARE|Kör ut virke',
+        'DRAGKROK|Måste på bilen', 'SNÖSLUNGA|Kastar vallar', 'SPARKSTÖTT|Glider på plogad väg',
+        'TORRAKA|Grå fura på rot', 'TÖRSHETRÄ|Brinner som fnöske', 'GUMMISTÖVEL|Torr på blöt myr'
+      ]
+    },
+
+    vardag: {
+      title: 'ARGA VARDAGSKRYSSET',
+      subtitle: 'Tvättstugeludd, mellanchefer & stulna matlådor',
+      label: 'Passivt Aggressiv Vardag',
+      issueTag: 'VARDAGSBILAGA',
+      prizeWords: [
+        'ARGLAPPEN|Svensk konflikthantering i tvättstugan',
+        'MATLÅDAN|Helig lunch i kontorets kylskåp',
+        'KALLPRAT|Konsten att diskutera vädret i hissen',
+        'SKIDBACKE|Förbjuden lutning på hushållsosten'
+      ],
+      words: [
+        'LUDDFILTER|Glöms i torkskåp', 'MATLÅDA|Stulen i fikakyl', 'MELLANCHEF|Älskar möten',
+        'SLASKTRATT|Full av matrester', 'SKIDBACKE|På hushållsosten', 'ARGLAPP|Sitter i trapphus',
+        'KALLPRAT|Om vädret i hiss', 'TELEFONKÖ|Plats 84 i kön', 'FREDAGSMYS|Tacos i soffan',
+        'TACOS|Helig fredagsmat', 'SYSTEMET|Stänger lördag 15', 'PANTKVITTO|Glöms i byxfickan',
+        'BESIKTNING|Domedag för bilen', 'SIGNALFEL|Stoppar tåget', 'VABRUARI|Snorig månad',
+        'VABBA|Hemma med barn', 'GRANNEN|Borrar kl 07:00', 'TVÄTTSTUGA|Bäddar för bråk',
+        'OSTHYVEL|Svenskt verktyg', 'KAFFEKOPP|Odiskad vid vask', 'MÅNDAG|Segaste starten',
+        'KÖLAPP|Dras på apotek', 'PARKERING|Aldrig ledig ruta', 'PBOT|Gul lapp på rutan',
+        'RÄKNINGAR|Äter upp lönen', 'SKATTEN|Dras varje månad', 'SOVMORGON|Förstörd av larm',
+        'SNARKNING|Sågar timmer i säng', 'LEGOBIT|Gör ont under fot', 'HALLMATTA|Full av blött grus',
+        'MATKASSE|Spricker på väg hem', 'SKOSKAV|Från nya kängor', 'SLADDHÄRVA|Bakom teven'
+      ]
+    },
+
+    frackis: {
+      title: 'FREDAGSFRÄCKISEN',
+      subtitle: 'Dubbeltydig buskis, fest & sena nätter',
+      label: 'Fräckis & Fest',
+      issueTag: 'HELGBILAGA • FREDAGSMYS',
+      prizeWords: [
+        'EFTERFEST|Börjar när krogen stänger klockan tre',
+        'BAKFYLLAN|Söndagens trognaste men minst välkomna gäst',
+        'BUSKISEN|Folklig humor under bältet',
+        'SNEDSTEG|Det man helst glömmer på måndag morgon',
+        'NATTAMAT|Kebabrulle på väg hem i gryningen'
+      ],
+      words: [
+        'SPRICKA|Trång i berget', 'GROTTA|Fuktig håla', 'KORVEN|Stoppas i bröd',
+        'BANAN|Böjd i klasen', 'GURKA|Lång och grön', 'SPRUTA|Klickar grädde',
+        'BUSKE|Ansas med sax', 'STOCK|Grov i skogen', 'STÅND|På torget',
+        'SVAMP|Växer i fukt', 'STAKET|Runt tomten', 'RULLGARDIN|Dras ner i rum',
+        'BAKMUS|Till kaffet? Nej!', 'SNEDSTEG|Ångras på måndag', 'FYLLEKÄK|Kebab kl 03:15',
+        'BAKFYLLA|Dunkar på söndag', 'BAKIS|Seg dagen efter', 'TEQUILA|Med salt & citron',
+        'BUBBEL|Skålas i glas', 'GROGG|Enkel femti-femti', 'SHOTS|Små glas i rad',
+        'KROGEN|Stänger sent', 'DANSGOLV|Svettig yta', 'KARAOKE|Falsksång i bar',
+        'FLIRT|Blick över baren', 'KURTIS|Uppvaktning', 'SVETTIG|Varm i kläderna',
+        'FUKTIG|Lagom blöt', 'KLADDIG|Klibbig om hand', 'EFTERFEST|Sista stoppet',
+        'FÖRFEST|Bästa delen av kväll', 'FYLLECELL|Ofrivilligt hotell', 'KEBAB|Nattmat i bröd',
+        'PIZZA|Räddar söndagen', 'BARTENDER|Skakar drinken', 'NATTKLUBB|Dunkande bas',
+        'DÄCKAD|Slocknad i soffa', 'BIRA|Kall i solen', 'PILSNER|Skummande öl',
+        'SNILLE|Klipsk typ', 'BUSKIS|Fräck folkhumor'
+      ]
+    },
+
+    snusk: {
+      title: 'SYNDIGA KRYSSNINGEN',
+      subtitle: 'Barnförbjudet kvällskryss (18+) • Utan filter',
+      label: '18+ Vuxet & Snuskigt',
+      issueTag: 'VUXENBILAGA • NR 69',
+      prizeWords: [
+        'ORGASMER|Kvällens skönaste höjdpunkter i sänghalmen',
+        'SNUSKERI|Barnförbjuden sysselsättning under täcket',
+        'ÄLSKOGEN|Het och svettig närkontakt utan kläder',
+        'KÅTHETEN|När lustan tar över helt och hållet',
+        'SYNDAREN|Den som aldrig tackar nej till en fräckis',
+        'EROTIKEN|Konsten att förföra i sängkammaren',
+        'GLIDET|När allt går extra lätt och friktionsfritt'
+      ],
+      words: [
+        'ORGASM|Skön kulmen', 'EREKTION|Styv i brallan', 'KLITORIS|Känslig knapp',
+        'GLIDMEDEL|Gör det halare', 'FÖRHUD|Dras tillbaka', 'ORALSEX|Jobb med munnen',
+        'SNUSKIG|Riktigt syndig', 'TREKANT|Tre i sängen', 'FETISCH|Het böjelse',
+        'KONDOMER|Skydd på staken', 'VIBRATOR|Surrar i lådan', 'DILDON|Stav av silikon',
+        'DILDO|Surrande leksak', 'STRAPON|Påspänd attrapp', 'SMISKA|Daska på skinkan',
+        'DOMINA|Sträng dam i läder', 'STÖNANDE|Ljud i sänghalm', 'PORRFILM|Het vuxenrulle',
+        'SWINGERS|Byter partners', 'KNULLA|Idka vild älskog', 'SNABBIS|Kort akt i hallen',
+        'AVSUGNING|Heta läppar', 'SPERMA|Vita droppar', 'SLIDAN|Fuktigt sköte',
+        'PENISEN|Manslemmen', 'PUNGEN|Påse under lem', 'OLLONET|Topp på staken',
+        'OLLON|Känslig spets', 'ANALEN|Bakre ingången', 'ANALSEX|Kärlek där bak',
+        'BUTTPLUG|Plugg i baken', 'RUNKA|Dra i spaken', 'ONANERA|Njuta på egen hand',
+        'ONANI|Solosex hemma', 'SEXLIV|Hålligång i säng', 'KÅTHET|Stark kättja',
+        'KÅTA|Sugna på synd', 'STÅND|Morgon-resning', 'TUTTAR|Yppig byst',
+        'BRÖSTEN|Fagra behag', 'RUMPAN|Rund bakdel', 'STJÄRT|Sittfläsk',
+        'SKINKA|Halva rumpan', 'VÅTFLÄCK|Spår på lakanet', 'SUGMÄRKE|Fläck på halsen',
+        'TROSOR|Åker av först', 'STRING|Tråd i skåran', 'SPETS|Sexigt tyg',
+        'PISKA|Snärtar skinkan', 'LÄDER|Stram klädsel', 'BOJOR|Låser vid säng',
+        'MISSIONÄR|Klassiskt läge', 'RIDTUR|Överst i sängen', 'BAKIFRÅN|På alla fyra',
+        'GRUPPSEX|Många i sängen', 'ORGIER|Vilda sexfester', 'ORGIE|Syndig gruppfest',
+        'NAKENBAD|Dopp utan tråd', 'NAKEN|Helt avklädd', 'STRIPPA|Kasta kläderna',
+        'ÄLSKARE|Hemligt sällskap', 'ÄLSKOG|Het omfamning', 'LUSTA|Syndigt begär',
+        'SNOPP|Liten veke', 'STAKE|Hård i byxan', 'KUKEN|Styv manslem',
+        'FITTA|Kvinnligt sköte', 'MUSEN|Mellan benen', 'BÅNGE|Rejält stånd',
+        'SLICKA|Jobba med tunga', 'SUGEN|Kåt och redo', 'SMUTS|Snusk i tanken',
+        'SYNDIG|Lagom förbjuden', 'SENSUELL|Eggande & het', 'EROTIK|Het konstform',
+        'EROTISK|Väcker lusta', 'FÖRSPEL|Innan akten', 'KYSSAR|Våta med tunga',
+        'HÅLLIGÅNG|Full fart i säng'
+      ]
+    },
+
+    mix: {
+      title: 'SALIG BLANDNING',
+      subtitle: 'Högt och lågt – allt mellan himmel och sänghalm',
+      label: 'Total Mix',
+      issueTag: 'SPECIALUPPLAGA',
+      prizeWords: [
+        'BLANDNING|Salig röra av både högt och lågt',
+        'KORSORDET|Helgens bästa hjärngympa'
+      ],
+      words: []
+    }
+  },
+
+  // Svenska småord (2–5 bokstäver) som flätar ihop de långa temaorden utan luckor
+  glueWords: [
+    'ÅR|Tolv månader', 'ÖL|Kall i sejdel', 'IS|Kyler i grogg', 'ÖN|Land i havet', 'ÅN|Rinner genom by',
+    'EK|Ståtligt träd', 'ÅL|Lång hal fisk', 'KO|Råmar i hage', 'SO|Skär i stian', 'RO|Stilla lugn',
+    'SY|Laga med tråd', 'NY|Helt oanvänd', 'RÅ|Ej tillagad', 'TÅ|Fram på foten', 'NÅ|Räcka fram',
+    'SÅ|Sätta frön', 'GÅ|Ta en promenad', 'MÅ|Känna sig', 'FÅ|Inte många', 'LÅ|Liten våg',
+    'BÖ|Liten gård', 'DÖ|Sluta leva', 'KÖ|Lång väntan', 'TÖ|Blidväder', 'MÖ|Ung dam förr',
+    'HÖ|Torkat gräs', 'LÄ|Skydd för vind', 'FÄ|Dum nöt', 'ÄR|Befinner sig', 'ÄT|Tugga i dig!',
+    'OK|Helt godkänt', 'OS|Matlukt i kök', 'AS|Riktigt usel', 'AX|På sädesstrå', 'ED|Heligt löfte',
+    'EN|Barrbuske', 'ER|Till eder', 'ID|Karpfisk', 'IL|Snabb vindby', 'IN|Genom dörren',
+    'NI|Du och dom', 'NU|Genast!', 'OR|Kvalster i mjöl', 'RY|Rykte på byn', 'SE|Titta hit',
+    'SI|Så och ...', 'TA|Greppa tag', 'TE|Dryck i kopp', 'TU|Dela i två', 'UR|Visar tiden',
+    'UT|I friska luften', 'VI|Du och jag', 'VY|Fin utsikt', 'YR|Snurrig i bollen', 'BO|Fågelrede',
+    'BY|Samling gårdar', 'DA|Kort för dag', 'DE|Dom där', 'DU|Just din person', 'FE|Trollväsen',
+    'FY|Usch och tvi!', 'GE|Räcka över', 'HA|Äga och hålla', 'JA|Positivt svar', 'JO|Så är det visst',
+    'JU|Som du vet', 'LE|Dra på smilband', 'LO|Skygg vildkatt', 'NÄ|Kort nej',
+    'EKA|Enkel roddbåt', 'OSA|Ryka ur pannan', 'ARA|Brokig papegoja', 'ERA|Historisk epok',
+    'ÖDE|Helt folktom', 'ÄGA|Ha i sin ägo', 'ÅKA|Färdas iväg', 'RÅA|Ej kokta', 'NÄS|Smal landtunga',
+    'BÅT|Flyter på sjön', 'SOL|Lyser på himlen', 'SNÖ|Vitt på marken', 'RÄV|Listig i skogen',
+    'ÄLG|Skogens konung', 'LÅS|Sitter i dörr', 'NÅL|Stickig i sykorg', 'SÅG|Kapar plankan',
+    'TÅG|Rullar på räls', 'VÅG|Bryts mot strand', 'BÅL|Majbrasa', 'KÅL|Växer i landet',
+    'MÅL|Nätkänning', 'SÅS|Till steken', 'NÄT|Fångar fisk', 'RÄT|90 grader', 'TÄT|Sluter helt tätt',
+    'LÄN|Del av Sverige', 'VÄN|Bästa polaren', 'RÅD|Tips i knipa', 'TÅR|Rinner på kind',
+    'SÅR|Kräver plåster', 'HÅR|Kalufs på knopp', 'LÅR|Ovanför knät', 'FÅR|Bräker i hagen',
+    'VÅR|Kommer i april', 'GÅS|Kacklar på gård', 'MÅS|Skränar i hamn', 'RÖK|Från skorsten',
+    'LÖK|Hackas i tårar', 'BÖK|Stök och slit', 'GÖK|Gal i björken', 'HÖK|Spanar i skyn',
+    'SÖK|Spårning', 'DÖD|Helt livlös', 'RÖD|Falu-kulör', 'NÖD|Har ingen lag', 'BÖN|Hoppfull önskan',
+    'LÖN|Trillar in den 25:e', 'KÖN|Rad vid kassan', 'BÖJ|Krök på röret', 'HÖJ|Skruva upp ljud',
+    'TÖJ|Stretcha ut', 'RÖJ|Städa eller festa', 'BAR|Naken eller disk', 'BAK|Rumpa eller bröd',
+    'BEN|Står man på', 'BIL|Rullar på väg', 'BIO|Film i mörker', 'BOK|Läses i sängen',
+    'BOR|Håller hus', 'BRA|Riktigt fint', 'BRO|Över älven', 'BUR|För papegoja', 'BUS|Rackartyg',
+    'BYN|Hemorten', 'DAG|Ljus del av dygn', 'DAL|Mellan fjällen', 'DAM|Stilig kvinna',
+    'DAN|Före dopparedan', 'DEL|Bit av kakan', 'DUK|Ligger på bord', 'DÅN|Högt muller',
+    'ELD|Värmer i spis', 'ENA|Få ihop gänget', 'ENE|Trä till smörkniv', 'FAT|Uppläggning',
+    'FEL|Inte rätt', 'FET|Drypande flottig', 'FIL|I morgonskål', 'FIN|Stilig och ren',
+    'FOT|I strumpan', 'FRU|Gift kvinna', 'FÅN|Tokstolle', 'GAP|Stort svalg', 'GAS|Trycks i botten',
+    'GET|Ger mesost', 'GIN|Med tonic', 'GLA|Munter i hågen', 'GLÖ|Glöd i kolen', 'GOD|Smakar mera',
+    'GOL|Skvallrade', 'GUL|Som en citron', 'GÅR|Fungerar fint', 'GÖS|Fin matfisk', 'HAL|Såpig som en ål',
+    'HAN|Killen där', 'HAT|Stark ilska', 'HAV|Salt och djupt', 'HEL|Inte trasig', 'HEM|Egen borg',
+    'HES|Skrovlig i hals', 'HET|Riktigt läcker', 'HIT|Till denna plats', 'HON|Tjejen där',
+    'HOT|Mörk varning', 'HUD|Bar kropp', 'HUS|Villa med tomt', 'HÅL|Öppning i vägg', 'HÅN|Elakt spe',
+    'HÄL|Bak på foten', 'HÄR|På fläcken', 'HÖG|Reslig i längd', 'JUL|Firar vi i dec',
+    'KAJ|Båtplats i hamn', 'KAM|Reder ut tovor', 'KAN|Behärskar', 'KAR|Stort badfat',
+    'KIL|Spräcker ved', 'KEX|Knaprigt till ost', 'KLO|Vass på katt', 'KNÄ|Mitt på benet',
+    'KOD|PIN till kort', 'KOK|Stryk och ...', 'KOL|I grillen', 'KOR|Betar i flock',
+    'KRY|Frisk och pigg', 'KUL|Riktigt skoj', 'KUR|Busskydd', 'KÅR|Fack eller student',
+    'KÄR|Förälskad', 'KÖK|Där kaffet kokas', 'KÖP|Affär i butik', 'KÖR|Sjunger i stämma',
+    'LAG|Sällskap i sport', 'LAM|Kraftlös', 'LAT|Slö i hängmatta', 'LAX|Rosa matfisk',
+    'LED|Skoterspår', 'LEK|Kul i sängen', 'LEN|Mjuk mot huden', 'LER|Ser glad ut', 'LIV|Full fart',
+    'LOK|Drar tåget', 'LOS|By i Hälsingland', 'LOV|Ledigt från plugg', 'LUS|Kliar i håret',
+    'LUT|Till julens fisk', 'LYA|Rävens håla', 'LÅG|Nära marken', 'LÅN|Skuld på bank',
+    'LÄK|Bli hel igen', 'LÄS|Öppna boken', 'LÖS|Fri från koppel', 'LÖV|Faller på hösten',
+    'MAN|Karl med skägg', 'MAT|Mättar magen', 'MED|Under på kälke', 'MEN|Litet hinder',
+    'MER|Ännu en portion', 'MES|Fegis vid fågelbord', 'MIL|Tio kilometer', 'MIN|Tillhör mig',
+    'MOD|Kurage i bröstet', 'MOR|Kära mamma', 'MOS|Till korven', 'MOT|I riktning till',
+    'MUR|Av tegelsten', 'MYR|Blöt hjortronmark', 'MÅR|Känner sig idag', 'MÄT|Ta fram tumstock',
+    'MÖS|Hade fredagsmys', 'TAK|Ovanför huvudet', 'TAL|Hålls på fest', 'TAM|Inte alls vild',
+    'TID|Går för fort', 'TIO|Efter nio', 'TOM|Urdrickat glas', 'TON|Klang i luren',
+    'TRE|En för mycket?', 'TRO|Hoppas på', 'TUR|Röta i spel', 'TVÅ|Ett par', 'TYG|Siden och sammet',
+    'TÅL|Orkar med', 'TÄR|Sliter på kraft', 'TÖM|Hästens tygel', 'TÖR|Vågar nog', 'UGN|Gräddar pizzan',
+    'ULL|Värmer från får', 'UNG|Ny i livet', 'VAD|Baksida på ben', 'VAK|Hål i vinteris',
+    'VAL|Stort djur i hav', 'VAN|Rutinerad räv', 'VAR|På vilket ställe', 'VAS|För snittblommor',
+    'VED|Travar i boden', 'VEK|Mjuk i ryggen', 'VET|Har koll på', 'VID|Bred och rymlig',
+    'VIK|Lugn bukt i sjö', 'VIN|Rött i glaset', 'VIS|Klok och lärd', 'VIT|Som nyfallen snö',
+    'VÅT|Dyblöt', 'VÄG|Leder hemåt', 'VÄL|Ganska bra', 'VÄV|I vävstolen', 'YTA|Blankt golv',
+    'YXA|I huggkubben', 'ÅRA|Ror man ekan med', 'ÅS|Höjd i terräng', 'ÄGG|Till frukost',
+    'ÄLD|Gammal tid', 'ÄLV|Bred norrlandså', 'ÄNG|Blommar i juni', 'ÄRR|Märke på huden',
+    'ÄRT|Till torsdagsfläsk', 'ÖGA|Blinkar flörtigt', 'ÖKA|Trycka på gasen', 'ÖM|Träningsvärk',
+    'ÖRA|Lyssnar nyfiket', 'ÖRN|Kretsar över fjäll', 'ÖRT|Krydda i mat', 'ÖS|Fullt drag!',
+    'ÖST|Där solen går upp', 'SOLA|Bättra på bränna', 'BADA|Ta ett dopp', 'SOVA|Snarka på kudde',
+    'LEKA|Roa sig kungligt', 'KAKA|Sju sorters ...', 'FIKA|Kaffe med dopp', 'TALA|Öppna munnen',
+    'SAGA|Berättas vid lägg', 'GATA|Genom staden', 'DATA|Ettor och nollor', 'MATA|Ge hunden mat',
+    'RATA|Tacka nej till', 'HATA|Avsky intensivt', 'LATA|Slöa i solen', 'BÅGE|Skjuter pilar',
+    'LÅGA|Flamma på ljus', 'VÅGA|Töras chansa', 'SÅGA|Kapa på mitten', 'TÅGA|Marschera fram',
+    'NÅDA|Bevilja nåd', 'RÅDA|Bestämma över', 'LÅDA|Byråfack', 'KÅDA|Klibbar på gran',
+    'BÅDA|Bägge två', 'ÄVEN|Likaså', 'ÄTA|Spisa middag', 'NÄRA|Tätt intill', 'BÄRA|Konka kassar',
+    'SKÄR|Rosa eller klippa', 'SVÄR|Tar till kraftord', 'TVÄR|Sur och vrång', 'KLÄR|Passar fint i',
+    'SNÖA|Singla ner vitt', 'RÖRA|Sleva i grytan', 'HÖRA|Lystra med örat', 'KÖRA|Ratta bilen',
+    'GÖRA|Fixa och ordna', 'FÖRA|Leda i dansen', 'BÖRA|Vara tvungen', 'MÖTE|Träff på tu man',
+    'BÖTA|Betala p-bot', 'MÖTA|Stöta ihop med', 'SÖTA|Sockrade bär', 'BLÖT|Genomvåt',
+    'SLÖT|Stängde igen', 'BRÖT|Knäckte kvisten', 'GRÖT|Kokas på havre', 'SKÖT|Fyrade av skott',
+    'SNÖN|Ligger vit', 'SJÖN|Blank vattenspegel', 'FRÖN|Sås i rabatt', 'GRÖN|Färg på gräset',
+    'SKÖN|Underbart njutbar', 'STÖN|Ljud under täcket', 'DRÖM|Under sömnen', 'SÖMN|Nattvila',
+    'SÄNG|Möbel för två', 'KALL|Kylig i vattnet', 'VARM|Het i bastun', 'MJUK|Skön mot huden',
+    'STEL|Styv i nacken', 'SLAK|Hänger mjukt ner', 'STYV|Rak och hård', 'DJUP|Långt till botten',
+    'KORT|Snabb i rocken', 'LÅNG|Räcker långt', 'SEGA|Tröga i starten'
+  ]
+};
