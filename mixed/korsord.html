@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Svenskt Tidningskryss – A4 Korsordsgenerator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Playfair+Display:ital,wght@0,800;1,700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            serif: ['Playfair Display', 'serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --grid-cols: 12;
+      --grid-rows: 16;
+      --cell-size: 13.5mm;
+      --clue-bg: #fef9c3;
+      --clue-text: #0f172a;
+      --prize-bg: #fde68a;
+      --block-bg: #cbd5e1;
+    }
+
+    /* Tema: Modern Gråvit */
+    body.style-modern {
+      --clue-bg: #f1f5f9;
+      --clue-text: #0f172a;
+      --prize-bg: #dbeafe;
+      --block-bg: #cbd5e1;
+    }
+
+    /* A4-ark för både skärm och utskrift */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Själva korsordsrutnätet */
+    .crossword-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-cols), var(--cell-size));
+      grid-template-rows: repeat(var(--grid-rows), var(--cell-size));
+      border: 2.4px solid #0f172a;
+      background-color: #0f172a;
+      gap: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    .cw-cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border-right: 1px solid #334155;
+      border-bottom: 1px solid #334155;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cw-cell.edge-right {
+      border-right: none !important;
+    }
+
+    .cw-cell.edge-bottom {
+      border-bottom: none !important;
+    }
+
+    /* Ledtrådsrutor (Pilkorsord) */
+    .cw-clue-cell {
+      background-color: var(--clue-bg);
+      color: var(--clue-text);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
+
+    .clue-slot {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0.4mm 0.7mm;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1.03;
+      word-break: break-word;
+      hyphens: manual;
+      overflow: hidden;
+    }
+
+    .clue-slot-top {
+      border-bottom: 1px solid #475569;
+    }
+
+    /* Bokstavsrutor */
+    .cw-letter-cell {
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: calc(var(--cell-size) * 0.56);
+      color: #0f172a;
+      cursor: pointer;
+      transition: background-color 0.1s ease;
+    }
+
+    .cw-letter-cell.prize-cell {
+      background-color: var(--prize-bg);
+    }
+
+    .cw-letter-cell.active-word {
+      background-color: #e0e7ff;
+    }
+
+    .cw-letter-cell.active-cell {
+      background-color: #c7d2fe;
+      outline: 2.2px solid #4f46e5;
+      outline-offset: -2.2px;
+      z-index: 10;
+    }
+
+    .cw-clue-cell.active-clue-highlight {
+      box-shadow: inset 0 0 0 2px #4f46e5;
+    }
+
+    /* Dekorativ utfyllnadsruta om någon enstaka ruta blir över */
+    .cw-block-cell {
+      background-color: var(--block-bg);
+      background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2.5px,
+        rgba(15, 23, 42, 0.14) 2.5px,
+        rgba(15, 23, 42, 0.14) 5px
+      );
+    }
+
+    /* Siffra för tävlingsord/lösenord i rutan */
+    .prize-num-badge {
+      position: absolute;
+      bottom: 0.5mm;
+      right: 0.7mm;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: calc(var(--cell-size) * 0.22);
+      font-weight: 800;
+      line-height: 1;
+      color: #0f172a;
+      background: rgba(255, 255, 255, 0.88);
+      border: 0.8px solid #0f172a;
+      border-radius: 999px;
+      width: calc(var(--cell-size) * 0.29);
+      height: calc(var(--cell-size) * 0.29);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    /* Litet streck mellan orden vid flerords-svar */
+    .cw-arrow-svg {
+      position: absolute;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    /* Lösenordsrutor längst ner */
+    .prize-strip-box {
+      width: 10.5mm;
+      height: 11.5mm;
+      border: 1.8px solid #0f172a;
+      background-color: var(--prize-bg);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 5.8mm;
+      color: #0f172a;
+    }
+
+    @media screen {
+      .a4-page {
+        margin: 0 auto 2.5rem auto;
+        padding: 7mm 9mm;
+        border-radius: 0.75rem;
+        box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 8px 12px -6px rgba(0, 0, 0, 0.06);
+        border: 1px solid #cbd5e1;
+      }
+
+      @media (max-width: 840px) {
+        .a4-page {
+          width: 100%;
+          min-height: auto;
+          padding: 0.75rem;
+          overflow-x: auto;
+        }
+      }
+    }
+
+    /* ==========================================================================
+       UTSKRIFTSREGLER FÖR A4
+       ========================================================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 5mm 7mm 5mm 7mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .a4-page {
+        width: 100% !important;
+        height: 285mm !important;
+        min-height: 285mm !important;
+        max-height: 285mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+      }
+
+      .a4-page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      /* Ta bort fokus-markeringar vid utskrift */
+      .cw-letter-cell.active-word,
+      .cw-letter-cell.active-cell {
+        background-color: #ffffff !important;
+        outline: none !important;
+      }
+
+      .cw-letter-cell.prize-cell.active-word,
+      .cw-letter-cell.prize-cell.active-cell {
+        background-color: var(--prize-bg) !important;
+        outline: none !important;
+      }
+
+      .cw-clue-cell.active-clue-highlight {
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+  <!-- Verktygsfält (döljs vid utskrift) -->
+  <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Titel & Tema-badge -->
+      <div class="flex items-center gap-3">
+        <div class="bg-slate-900 text-amber-300 p-2 rounded-xl font-serif font-extrabold text-lg flex items-center justify-center w-10 h-10 shadow-sm border border-slate-700">
+          ÅÄÖ
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <span>Svenskt Tidningskryss</span>
+            <span id="header-theme-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-rose-100 text-rose-800 border-rose-200">
+              🔥 18+ Vuxet & Snuskigt
+            </span>
+          </h1>
+          <p id="header-stats-text" class="text-xs text-slate-500">Äkta svenskt pilkorsord med ledtrådar i rutorna & tävlingsord</p>
+        </div>
+      </div>
+
+      <!-- Primära knappar -->
+      <div class="flex items-center gap-2">
+        <button id="btn-generate" onclick="generateNewCrossword()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Slumpa nytt kryss
+        </button>
+
+        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Skriv ut (A4)
+        </button>
+      </div>
+    </div>
+
+    <!-- Sekundärt inställningsfält -->
+    <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-2.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-medium text-slate-600">
+        
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <!-- Tema-väljare -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500 font-semibold">Tema:</span>
+            <select id="theme-select" onchange="changeTheme(this.value)" class="bg-white border border-slate-300 text-slate-900 rounded-md px-2.5 py-1 text-xs font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="snusk" selected>🔥 18+ Riktigt Vuxet & Snuskigt</option>
+              <option value="frackis">😏 Fräckis, Fest & Dubbeltydigt</option>
+              <option value="skog">🌲 Skog, Jakt, Skoter & Bygdeliv</option>
+              <option value="vardag">😤 Passivt Aggressiv Vardag</option>
+              <option value="klassisk">📰 Klassiskt Tidningskryss</option>
+              <option value="mix">🎲 Total Mix (Alla teman)</option>
+            </select>
+          </div>
+
+          <!-- Rutnätsformat -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500">Format:</span>
+            <select id="size-preset-select" onchange="changeGridPreset(this.value)" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="11x14">11×14 (Extra stora rutor)</option>
+              <option value="12x16" selected>12×16 (Standard Helark A4)</option>
+              <option value="13x17">13×17 (Tätt Storkryss)</option>
+            </select>
+          </div>
+
+          <!-- Tidningsstil -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500">Färgstil:</span>
+            <select id="visual-style-select" onchange="changeVisualStyle(this.value)" class="bg-white border border-slate-300 text-slate-800 rounded-md px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <option value="classic" selected>Tidningsgul (Klassisk)</option>
+              <option value="modern">Gråvit & Blå (Modern)</option>
+            </select>
+          </div>
+
+          <!-- Finjustera storlek på A4 -->
+          <div class="flex items-center gap-2 bg-white px-2.5 py-1 rounded-md border border-slate-300">
+            <span class="text-slate-500">Skala:</span>
+            <input id="scale-slider" type="range" min="85" max="106" step="1" value="100" oninput="changeScale(parseInt(this.value))" class="w-20 accent-indigo-600 cursor-pointer">
+            <span id="scale-label" class="font-mono text-[11px] text-slate-800 font-semibold w-10 text-right">100%</span>
+          </div>
+        </div>
+
+        <!-- Höger: Facit-kryssruta -->
+        <div class="flex items-center gap-4">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="check-solution-page" checked onchange="toggleSolutionPage(this.checked)" class="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 cursor-pointer">
+            <span>Inkludera facitsida (Sida 2)</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-5 print:p-0 print:max-w-none">
+    
+    <!-- Skärm-kontroller för att lösa krysset direkt i webbläsaren -->
+    <div class="no-print mb-5 p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs sm:text-sm">
+      <div class="flex items-start gap-3">
+        <div class="p-2 bg-amber-50 text-amber-700 rounded-lg shrink-0 mt-0.5 border border-amber-200 font-mono font-bold text-xs">
+          <span id="dir-indicator"> RIKTNING: → VÅGRÄTT </span>
+        </div>
+        <div>
+          <p id="active-clue-banner" class="font-semibold text-slate-900">
+            Klicka i en ruta för att börja lösa på skärmen – eller skriv ut arket direkt!
+          </p>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Tryck <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded text-[10px] font-mono">Mellanslag</kbd> eller klicka på samma ruta igen för att byta mellan Vågrätt (→) och Lodrätt (↓).
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 shrink-0 self-end md:self-auto">
+        <button onclick="revealHintLetter()" class="px-3 py-1.5 text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg border border-amber-300 transition cursor-pointer">
+          💡 Ge bokstav
+        </button>
+        <button onclick="checkUserCrossword()" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 transition cursor-pointer">
+          Kontrollera svar
+        </button>
+        <button onclick="clearUserEntries()" class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 transition cursor-pointer">
+          Rensa krysset
+        </button>
+      </div>
+    </div>
+
+    <!-- A4-behållare -->
+    <div id="pages-container" class="print-container"></div>
+  </main>
+
+  <!-- Toast-meddelande -->
+  <div id="toast" class="no-print fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-xl border border-slate-700 transition-all duration-300 transform translate-y-20 opacity-0 flex items-center gap-2.5 pointer-events-none z-50">
+    <span id="toast-icon">✨</span>
+    <span id="toast-msg">Meddelande</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. SVENSKA ORDLISTOR PER TEMA + KLISTERORD
+    //    Alla ledtrådar är koncisa för att passa perfekt i pilkorsordsrutor.
+    // =========================================================================
+
+    const THEME_META = {
+      snusk: {
+        title: 'SYNDIGA KRYSSNINGEN',
+        subtitle: 'Barnförbjudet kvällskryss (18+) • Utan filter',
+        badge: '🔥 18+ Vuxet & Snuskigt',
+        badgeClass: 'bg-rose-100 text-rose-800 border-rose-200',
+        issueTag: 'VUXENBILAGA • NR 69'
+      },
+      frackis: {
+        title: 'FREDAGSFRÄCKISEN',
+        subtitle: 'Dubbeltydig buskis, fest & sena nätter',
+        badge: '😏 Fräckis & Fest',
+        badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+        issueTag: 'HELGBILAGA • FREDAGSMYS'
+      },
+      skog: {
+        title: 'SKOGS- & BYGDEKRYSSET',
+        subtitle: 'Skoter, jakt, fiske, vedbod & riktig vinter',
+        badge: '🌲 Skog & Bygdeliv',
+        badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        issueTag: 'FRILUFTSBILAGA'
+      },
+      vardag: {
+        title: 'ARGA VARDAGSKRYSSET',
+        subtitle: 'Tvättstugeludd, mellanchefer & stulna matlådor',
+        badge: '😤 Passivt Aggressiv Vardag',
+        badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+        issueTag: 'VARDAGSBILAGA'
+      },
+      klassisk: {
+        title: 'STORA SÖNDAGSKRYSSET',
+        subtitle: 'Klassiskt svenskt tidningskryss för kaffestunden',
+        badge: '📰 Klassiskt Kryss',
+        badgeClass: 'bg-slate-200 text-slate-800 border-slate-300',
+        issueTag: 'FAMILJEBILAGA'
+      },
+      mix: {
+        title: 'SALIG BLANDNING',
+        subtitle: 'Högt och lågt – allt mellan himmel och sänghalm',
+        badge: '🎲 Total Mix',
+        badgeClass: 'bg-purple-100 text-purple-800 border-purple-200',
+        issueTag: 'SPECIAL
