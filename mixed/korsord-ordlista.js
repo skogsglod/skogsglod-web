@@ -1,6 +1,6 @@
 /**
  * ORDLISTA FÖR SVENSKT TIDNINGSKRYSS (korsord-ordlista.js)
- * Format: "ORD|Ledtråd" (får max vara 12 bokstäver, A-Ö)
+ * Format: "ORD|Ledtråd" (A-Ö, 2 till 12 bokstäver)
  */
 
 window.CROSSWORD_DATA = {
@@ -27,12 +27,13 @@ window.CROSSWORD_DATA = {
         'GLASSBIL|Spelar trudelutt', 'PLÅSTER|På skrubbsåret', 'PARASOLL|Ger skugga i sol',
         'PARAPLY|Skydd mot skur', 'TRÄDGÅRD|Odlas med rabatt', 'GRÄSKLIPP|Doftar sommar',
         'HAMMOCK|Gungar i skuggan', 'BOKHYLLA|Full av romaner', 'DECKARE|Spännande läsning',
-        'SMÖRGÅS|Bredda med ost', 'PANNKAKA|Med sylt och grädde', 'VÅFFLOR|Frasiga med hjortron',
+        'SMÖRGÅS|Bredd med ost', 'PANNKAKA|Med sylt och grädde', 'VÅFFLOR|Frasiga med sylt',
         'BRYGGAN|Ut i vattnet', 'METSPÖ|Med flöte och mask', 'CYKELTUR|Utflykt på två hjul',
-        'BLÅBÄR|Gör tungan blå', 'SMULTRON|Träs på grässtrå', ' HALLON|Röda på busken',
+        'BLÅBÄR|Gör tungan blå', 'SMULTRON|Träs på grässtrå', 'HALLON|Röda på busken',
         'RABARBER|Syrlig i pajen', 'SYRENER|Doftar i maj', 'TULPANER|Vårens snittblommor',
-        'STRANDEN|Sand mellan tårna', 'BADKRUKA|Doppar bara tån', 'Kikare|Spanar mot horisont',
-        'TERMOS|Håller kaffet varmt', 'RYGGSÄCK|Packad för utflykt', ' picknick|Mat på filt i gräset'
+        'STRANDEN|Sand mellan tårna', 'BADKRUKA|Doppar bara tån', 'KIKARE|Spanar mot horisont',
+        'TERMOS|Håller kaffet varmt', 'RYGGSÄCK|Packad för utflykt', 'PICKNICK|Mat på filt',
+        'SOCKERKAKA|Gräddas i rund form', 'kokbok|Full av recept', 'FÅGELHOLK|Spikas upp i träd'
       ]
     },
 
@@ -61,8 +62,8 @@ window.CROSSWORD_DATA = {
         'JAKTLAG|Samlas vid slaktbod', 'PASSKYTT|Sitter tyst i torn', 'ÄLGHUND|Skäller ståndskall',
         'KAMIN|Värmer stugan', 'TÄNDVED|Tunna stickor', 'YXAN|Klyver kubben',
         'TIMMER|Grova stockar', 'KALHYGGE|Öppet efter såg', 'SKOTARE|Kör ut virke',
-        'DRAGKROK|Måste på bilen', 'SNÖSLUNGA|Kastar vallar', 'SPARKSTÖTT|Glider på plogad väg',
-        'TORRAKA|Grå fura på rot', 'TÖRSHETRÄ|Brinner som fnöske', 'GUMMISTÖVEL|Torr på blöt myr'
+        'DRAGKROK|Måste på bilen', 'SNÖSLUNGA|Kastar vallar', 'TORRAKA|Grå fura på rot',
+        'FLUGSPÖ|Kastar i strömmen', 'SPINNARE|Lockar abborren', 'HUGGKUBBE|Står vid vedboden'
       ]
     },
 
@@ -180,7 +181,7 @@ window.CROSSWORD_DATA = {
     }
   },
 
-  // Svenska småord (2–5 bokstäver) som flätar ihop de långa temaorden utan luckor
+  // Svenska småord & sammanbindningsord (2–5 bokstäver)
   glueWords: [
     'ÅR|Tolv månader', 'ÖL|Kall i sejdel', 'IS|Kyler i grogg', 'ÖN|Land i havet', 'ÅN|Rinner genom by',
     'EK|Ståtligt träd', 'ÅL|Lång hal fisk', 'KO|Råmar i hage', 'SO|Skär i stian', 'RO|Stilla lugn',
@@ -265,6 +266,25 @@ window.CROSSWORD_DATA = {
     'SKÖN|Underbart njutbar', 'STÖN|Ljud under täcket', 'DRÖM|Under sömnen', 'SÖMN|Nattvila',
     'SÄNG|Möbel för två', 'KALL|Kylig i vattnet', 'VARM|Het i bastun', 'MJUK|Skön mot huden',
     'STEL|Styv i nacken', 'SLAK|Hänger mjukt ner', 'STYV|Rak och hård', 'DJUP|Långt till botten',
-    'KORT|Snabb i rocken', 'LÅNG|Räcker långt', 'SEGA|Tröga i starten'
+    'KORT|Snabb i rocken', 'LÅNG|Räcker långt', 'SEGA|Tröga i starten', 'ADEL|Blåblodiga',
+    'ALFA|Första bokstaven', 'ALLT|Varenda smula', 'ANKE|Liten fågel', 'ANKA|Kvackar i damm',
+    'APOR|Klättrar i lian', 'ARAB|Fullblodshäst', 'ARLA|Tidigt på morgon', 'ARMA|Stackars satar',
+    'ARVE|Liten växt', 'ASKA|Kvar i kaminen', 'ATOM|Liten partikel', 'AVIG|Ut och in',
+    'AXEL|Skuldra', 'BACK|Låda för läsk', 'BALK|Bär upp taket', 'BALL|Riktigt häftig',
+    'BAND|Rosett eller grupp', 'BANK|Sparar slantarna', 'BARK|På trädstammen', 'BARN|Småttingar',
+    'BASK|Mössa på sned', 'BAST|Snöre i bastu', 'BETY|Betyg i skolan', 'BILA|Resa med bil',
+    'BIND|Hålla ihop', 'BITA|Sätta tänderna i', 'BLAD|På björken', 'BLÅA|Som sommarhimlen',
+    'BLÅS|Vind på fjället', 'BOCK|Hoppar i hagen', 'BOJA|Förtöjer båten', 'BOLL|Sparkas på plan',
+    'BORD|Dukas för mat', 'BORG|Slott med tinnar', 'BORR|Gör hål i vägg', 'BOTA|Göra helt frisk',
+    'BREV|Ligger i lådan', 'BRUD|Står vid altaret', 'BRUK|Gammal vana', 'BRUN|Färg på bönor',
+    'BRUS|Sus i skogen', 'BRÖD|Skivas till frukost', 'BUKA|Bukta utåt', 'BUKT|Liten vik',
+    'BULT|Skruv med mutter', 'BURK|Med inlagd sill', 'BUSA|Göra hyss', 'BUSS|Går enligt tabell',
+    'BYTA|Göra byteshandel', 'BYXA|Dras på benen', 'BÄCK|Porlar i skogen', 'BÄDD|Bäddad säng',
+    'BÄNK|Att sitta på', 'BÄST|Allra främst', 'DANS|Vals på logen', 'DEGA|Knåda bröd',
+    'DIKE|Längs grusvägen', 'DILL|Till färskpotatis', 'DISK|Väntar i vasken', 'DJUR|I skog och mark',
+    'DOFT|Från nybryggt kaffe', 'DOPP|I kall sjö', 'DRAG|Fiskedrag i lina', 'DRAK|Flyger i snöre',
+    'DUKA|Ställa fram porslin', 'DUNK|Plastkärl', 'DYNA|Mjuk på stolen', 'DÄCK|Runt fälgen',
+    'DÖRR|Stängs med handtag', 'EGEN|Helt privat', 'EKOR|Svarar mot berg', 'ELAK|Taskig typ',
+    'ELIT|De allra bästa', 'ENIG|Helt överens', 'ENKEL|Lätt som en plätt'
   ]
 };
