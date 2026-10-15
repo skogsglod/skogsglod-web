@@ -206,48 +206,10 @@
             .then(data => {
                 listElement.innerHTML = '';
 
-                // Filtrera bort index.html och eventuella dolda systemfiler
-                const files = data.filter(item => 
-                    item.type === 'file' && 
-                    item.name.toLowerCase() !== 'index.html' && 
-                    !item.name.startsWith('.')
-                );
-
-                if (files.length === 0) {
-                    listElement.innerHTML = '<li class="status-msg">Inga filer hittades i mappen.</li>';
-                    return;
-                }
-
-                files.forEach(file => {
-                    const li = document.createElement('li');
-                    li.className = 'file-item';
-
-                    const a = document.createElement('a');
-                    a.href = file.name;
-
-                    // Gör filnamnet mer lättläst (tar bort .html och byter _ till mellanslag)
-                    const cleanName = file.name
-                        .replace(/\.[^/.]+$/, "")
-                        .replace(/[_-]/g, ' ');
-
-                    a.innerHTML = `
-                        <span class="file-name">${cleanName}</span>
-                        <span class="file-arrow">&rarr;</span>
-                    `;
-
-                    li.appendChild(a);
-                    listElement.appendChild(li);
-                });
-            })
-            .catch(err => {
-                console.error('Kunde inte läsa in filerna:', err);
-                listElement.innerHTML = `
-                    <li class="status-msg">
-                        Kunde inte hämta filer automatiskt.<br>
-                        <small style="color: #666; display: block; margin-top: 6px;">Kontrollera att mappen mixed och dina filer är pushade till GitHub.</small>
-                    </li>
-                `;
-            });
-    </script>
-</body>
-</html>
+                // Visa endast .html-filer (exklusive index.html och dolda filer)
+                const files = data.filter(item => {
+                    const fileName = item.name.toLowerCase();
+                    return (
+                        item.type === 'file' &&
+                        fileName.endsWith('.html') &&
+                        fileName !== 'index.html' &&
