@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Playfair+Display:ital,wght@0,800;1,700&display=swap" rel="stylesheet">
 
-  <!-- Ladda den externa ordlistan -->
+  <!-- Extern ordlista (enkelt att fylla på med fler ord) -->
   <script src="korsord-ordlista.js"></script>
 
   <script>
@@ -95,11 +95,11 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 0.4mm 0.7mm;
+      padding: 0.35mm 0.6mm;
       font-weight: 750;
       text-transform: uppercase;
       letter-spacing: -0.02em;
-      line-height: 1.03;
+      line-height: 1.02;
       word-break: break-word;
       overflow: hidden;
     }
@@ -230,7 +230,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-  <!-- Verktygsfält (döljs vid utskrift) -->
   <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       
@@ -259,7 +258,6 @@
       </div>
     </div>
 
-    <!-- Sekundärt inställningsfält -->
     <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-2.5">
       <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-medium text-slate-600">
         
@@ -378,22 +376,35 @@
 
     function parseWordEntry(item) {
       if (typeof item === 'string') {
-        const parts = item.split('|');
-        return { w: normalizeWord(parts[0] || ''), c: (parts[1] || '').trim() };
+        const idx = item.indexOf('|');
+        if (idx === -1) return { w: '', c: '' };
+        return { w: normalizeWord(item.slice(0, idx)), c: item.slice(idx + 1).trim() };
       }
       return { w: normalizeWord(item.w || ''), c: (item.c || item.clue || '').trim() };
     }
 
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
     function buildDictionaryForTheme(themeKey) {
       const data = window.CROSSWORD_DATA;
-      const seen = new Map();
+      const dictMap = new Map();
+      const byLength = {};
 
       const addList = (list, priority) => {
         (list || []).forEach(raw => {
           const parsed = parseWordEntry(raw);
           if (parsed.w.length < 2 || parsed.w.length > 12 || !parsed.c) return;
-          if (!seen.has(parsed.w)) {
-            seen.set(parsed.w, { w: parsed.w, c: parsed.c, priority });
+          if (!dictMap.has(parsed.w)) {
+            const entry = { w: parsed.w, c: parsed.c, priority };
+            dictMap.set(parsed.w, entry);
+            (byLength[parsed.w.length] = byLength[parsed.w.length] || []).push(entry);
           }
         });
       };
@@ -409,16 +420,7 @@
       }
 
       addList(data.glueWords, 1);
-      return seen;
-    }
-
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
+      return { dictMap, byLength };
     }
 
     function createEmptyGrid(rows, cols) {
@@ -441,20 +443,23 @@
         }
         g.push(row);
       }
-      g[0][0].type = 'CLUE';
-      g[0][0].noLetter = true;
       return g;
     }
 
-    function getClueSlotRequirement(grid, startR, startC, dir) {
+    /**
+     * Hämtar vilken ledtrådsruta och pil som krävs för att starta ett ord på (startR, startC).
+     * Vågräta ord tillåts på r >= 1, och lodräta ord på c >= 1 så att ytterkanterna aldrig låser korsningar!
+     */
+    function getClueSlotRequirement(startR, startC, dir) {
       if (dir === 'H') {
+        if (startR < 1) return null; // Rad 0 reserverad för topp-ledtrådar och lodräta starter
         if (startC >= 1) return { clueR: startR, clueC: startC - 1, slot: 'rightExit', arrow: 'right' };
-        if (startC === 0 && startR >= 1) return { clueR: startR - 1, clueC: 0, slot: 'bottomExit', arrow: 'down-right' };
+        return { clueR: startR - 1, clueC: 0, slot: 'bottomExit', arrow: 'down-right' };
       } else {
+        if (startC < 1) return null; // Kolumn 0 reserverad för vänster-ledtrådar och vågräta starter
         if (startR >= 1) return { clueR: startR - 1, clueC: startC, slot: 'bottomExit', arrow: 'down' };
-        if (startR === 0 && startC >= 1) return { clueR: 0, clueC: startC - 1, slot: 'rightExit', arrow: 'right-down' };
+        return { clueR: 0, clueC: startC - 1, slot: 'rightExit', arrow: 'right-down' };
       }
-      return null;
     }
 
     function canUseClueSlot(grid, req) {
@@ -470,9 +475,15 @@
       if (dir === 'H' && startC + len > cols) return null;
       if (dir === 'V' && startR + len > rows) return null;
 
-      const mainClueReq = getClueSlotRequirement(grid, startR, startC, dir);
+      const mainClueReq = getClueSlotRequirement(startR, startC, dir);
       if (!canUseClueSlot(grid, mainClueReq)) return null;
 
+      // Om ett lodrätt ord startar på rad 0 får inte rutan direkt till höger på rad 0 vara en bokstav
+      if (dir === 'V' && startR === 0 && startC + 1 < cols && grid[0][startC + 1].type === 'LETTER') return null;
+      // Om ett vågrätt ord startar i kolumn 0 får inte rutan direkt under i kolumn 0 vara en bokstav
+      if (dir === 'H' && startC === 0 && startR + 1 < rows && grid[startR + 1][0].type === 'LETTER') return null;
+
+      // Rutan direkt efter ordet får inte vara en bokstav
       const afterR = dir === 'H' ? startR : startR + len;
       const afterC = dir === 'H' ? startC + len : startC;
       if (afterR < rows && afterC < cols && grid[afterR][afterC].type === 'LETTER') return null;
@@ -534,7 +545,7 @@
             const perpEntry = dictMap.get(perpStr);
             if (!perpEntry || usedWords.has(perpStr) || batchUsedWords.has(perpStr)) return null;
 
-            const perpClueReq = getClueSlotRequirement(grid, pStartR, pStartC, perpDir);
+            const perpClueReq = getClueSlotRequirement(pStartR, pStartC, perpDir);
             if (!canUseClueSlot(grid, perpClueReq)) return null;
 
             const slotKey = `${perpClueReq.clueR},${perpClueReq.clueC},${perpClueReq.slot}`;
@@ -560,8 +571,14 @@
 
       if ((requireIntersection && intersections === 0) || newLetterCells === 0) return null;
 
-      const reusesClueCell = grid[mainClueReq.clueR][mainClueReq.clueC].type === 'CLUE' ? 14 : 0;
-      const score = intersections * 28 + len * 4 + entry.priority * 18 + reusesClueCell + autoPerpWords.length * 22 + Math.random() * 6;
+      const reusesClueCell = grid[mainClueReq.clueR][mainClueReq.clueC].type === 'CLUE' ? 18 : 0;
+      const score =
+        intersections * 35 +
+        len * 7 +
+        entry.priority * 24 +
+        reusesClueCell +
+        autoPerpWords.length * 30 +
+        Math.random() * 10;
 
       return { entry, startR, startC, dir, mainClueReq, autoPerpWords, score };
     }
@@ -587,9 +604,14 @@
           cells.push({ r, c });
         }
 
+        // Lås rutan direkt efter ordet
         const afterR = dir === 'H' ? startR : startR + len;
         const afterC = dir === 'H' ? startC + len : startC;
         if (afterR < rows && afterC < cols) grid[afterR][afterC].noLetter = true;
+
+        // Om ordet startar på rad 0 (lodrätt) eller kolumn 0 (vågrätt), lås grannrutan längs kanten
+        if (dir === 'V' && startR === 0 && startC + 1 < cols) grid[0][startC + 1].noLetter = true;
+        if (dir === 'H' && startC === 0 && startR + 1 < rows) grid[startR + 1][0].noLetter = true;
 
         placedWords.push({
           id: wordId, word: entry.w, clue: entry.c, priority: entry.priority,
@@ -603,67 +625,155 @@
       placement.autoPerpWords.forEach(pw => placeSingle(pw.entry, pw.startR, pw.startC, pw.dir, pw.clueReq));
     }
 
+    /**
+     * Snabb mönstersökning som hittar det bästa giltiga ordet att lägga ut på brädet.
+     */
+    function findBestMoveOnBoard(grid, rows, cols, dictMap, byLength, usedWords, requireIntersection, minLen = 2) {
+      let bestMove = null;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          for (const dir of ['H', 'V']) {
+            const req = getClueSlotRequirement(r, c, dir);
+            if (!canUseClueSlot(grid, req)) continue;
+
+            // Beräkna hur långt ett ord maximalt kan gå från (r, c) i riktning dir
+            const maxPossible = dir === 'H' ? cols - c : rows - r;
+            let maxLen = 0;
+            for (let k = 0; k < maxPossible; k++) {
+              const rk = dir === 'H' ? r : r + k;
+              const ck = dir === 'H' ? c + k : c;
+              const cell = grid[rk][ck];
+              if (cell.type === 'CLUE' || cell.noLetter) break;
+              if (dir === 'H' && cell.hWordId !== null) break;
+              if (dir === 'V' && cell.vWordId !== null) break;
+              maxLen = k + 1;
+            }
+
+            if (maxLen < minLen) continue;
+
+            for (let len = maxLen; len >= minLen; len--) {
+              // Rutan direkt efter ordlängden får inte vara en bokstav
+              const afterR = dir === 'H' ? r : r + len;
+              const afterC = dir === 'H' ? c + len : c;
+              if (afterR < rows && afterC < cols && grid[afterR][afterC].type === 'LETTER') continue;
+
+              // Kolla vilka bokstäver som redan ligger längs banan
+              let hasExistingLetter = false;
+              let allAlreadyFilled = true;
+              const pattern = new Array(len);
+
+              for (let k = 0; k < len; k++) {
+                const rk = dir === 'H' ? r : r + k;
+                const ck = dir === 'H' ? c + k : c;
+                const ch = grid[rk][ck].char;
+                pattern[k] = ch;
+                if (ch) hasExistingLetter = true;
+                else allAlreadyFilled = false;
+              }
+
+              if (allAlreadyFilled) continue;
+              if (requireIntersection && !hasExistingLetter) {
+                // Tillåt även icke-direkt korsning om den bildar vinkelräta ord intill befintliga rutor
+                let touchesAdjacentLetter = false;
+                const dr = dir === 'H' ? 1 : 0;
+                const dc = dir === 'H' ? 0 : 1;
+                for (let k = 0; k < len; k++) {
+                  const rk = dir === 'H' ? r : r + k;
+                  const ck = dir === 'H' ? c + k : c;
+                  if (
+                    (rk - dr >= 0 && ck - dc >= 0 && grid[rk - dr][ck - dc].type === 'LETTER') ||
+                    (rk + dr < rows && ck + dc < cols && grid[rk + dr][ck + dc].type === 'LETTER')
+                  ) {
+                    touchesAdjacentLetter = true;
+                    break;
+                  }
+                }
+                if (!touchesAdjacentLetter) continue;
+              }
+
+              const candidates = byLength[len] || [];
+              for (let idx = 0; idx < candidates.length; idx++) {
+                const cand = candidates[idx];
+                if (usedWords.has(cand.w)) continue;
+
+                // Snabb mönsterkontroll innan full evaluering
+                let matchesPattern = true;
+                for (let k = 0; k < len; k++) {
+                  if (pattern[k] && pattern[k] !== cand.w[k]) {
+                    matchesPattern = false;
+                    break;
+                  }
+                }
+                if (!matchesPattern) continue;
+
+                const move = evaluatePlacement(grid, rows, cols, cand, r, c, dir, dictMap, usedWords, requireIntersection);
+                if (move && (!bestMove || move.score > bestMove.score)) {
+                  bestMove = move;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return bestMove;
+    }
+
     function generateBestCrossword(rows, cols, themeKey) {
-      const dictMap = buildDictionaryForTheme(themeKey);
-      const allEntries = Array.from(dictMap.values());
-      const themeEntries = allEntries.filter(e => e.priority >= 3 && e.w.length >= 4);
-      const mediumEntries = allEntries.filter(e => e.w.length >= 4);
-      const shortEntries = allEntries.filter(e => e.w.length <= 4);
+      const { dictMap, byLength } = buildDictionaryForTheme(themeKey);
 
-      let bestResult = null, bestFitness = -1;
+      // Slumpa ordningen inom varje ordlängd inför genereringen
+      Object.keys(byLength).forEach(len => {
+        byLength[len] = shuffle(byLength[len]);
+      });
 
-      for (let attempt = 0; attempt < 14; attempt++) {
+      let bestResult = null;
+      let bestFitness = -1;
+
+      const attempts = 8;
+      for (let attempt = 0; attempt < attempts; attempt++) {
+        Object.keys(byLength).forEach(len => {
+          byLength[len] = shuffle(byLength[len]);
+        });
+
         const grid = createEmptyGrid(rows, cols);
         const placedWords = [];
         const usedWords = new Set();
 
-        const startH = shuffle(themeEntries.filter(e => e.w.length >= 6 && e.w.length <= cols - 2));
-        if (startH.length > 0) {
-          const firstH = evaluatePlacement(grid, rows, cols, startH[0], 0, 1, 'H', dictMap, usedWords, false);
-          if (firstH) applyPlacement(grid, rows, cols, firstH, placedWords, usedWords);
-        }
-
-        for (const cand of shuffle(themeEntries.filter(e => e.w.length >= 6 && e.w.length <= rows - 2))) {
-          const firstV = evaluatePlacement(grid, rows, cols, cand, 1, 0, 'V', dictMap, usedWords, false);
-          if (firstV) { applyPlacement(grid, rows, cols, firstV, placedWords, usedWords); break; }
-        }
-
-        let keepGoing = true, pass = 0;
-        while (keepGoing && pass < 55) {
-          keepGoing = false; pass++;
-          const pool = pass <= 16
-            ? shuffle(themeEntries).slice(0, 65).concat(shuffle(mediumEntries).slice(0, 35))
-            : (pass <= 34 ? shuffle(mediumEntries).slice(0, 80).concat(shuffle(shortEntries).slice(0, 50)) : shuffle(shortEntries));
-
-          let bestMove = null;
-          for (const entry of pool) {
-            for (let r = 0; r < rows; r++) {
-              for (let c = 0; c < cols; c++) {
-                for (const dir of ['H', 'V']) {
-                  const move = evaluatePlacement(grid, rows, cols, entry, r, c, dir, dictMap, usedWords, placedWords.length > 0);
-                  if (move && (!bestMove || move.score > bestMove.score)) bestMove = move;
-                }
-              }
-            }
-            if (bestMove && bestMove.score > 95 && pass <= 25) break;
-          }
-
-          if (!bestMove && pass > 10) {
-            for (const entry of shuffle(mediumEntries).slice(0, 60)) {
-              for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                  for (const dir of ['H', 'V']) {
-                    const move = evaluatePlacement(grid, rows, cols, entry, r, c, dir, dictMap, usedWords, false);
-                    if (move && grid[move.mainClueReq.clueR][move.mainClueReq.clueC].type === 'CLUE' && (!bestMove || move.score > bestMove.score)) {
-                      bestMove = move;
-                    }
-                  }
-                }
+        // 1. Lägg ut 3–4 vågräta basord ("ryggrader") jämnt fördelade över A4-sidan
+        const spineRows = [1, Math.floor(rows * 0.35), Math.floor(rows * 0.68), rows - 2];
+        for (const sr of spineRows) {
+          let placedSpine = false;
+          for (let len = Math.min(10, cols - 1); len >= 5 && !placedSpine; len--) {
+            const cands = (byLength[len] || []).filter(e => e.priority >= 2);
+            for (const cand of cands) {
+              const startC = Math.random() < 0.5 ? 1 : Math.max(1, cols - len);
+              const move = evaluatePlacement(grid, rows, cols, cand, sr, startC, 'H', dictMap, usedWords, false);
+              if (move) {
+                applyPlacement(grid, rows, cols, move, placedWords, usedWords);
+                placedSpine = true;
+                break;
               }
             }
           }
+        }
 
-          if (bestMove) { applyPlacement(grid, rows, cols, bestMove, placedWords, usedWords); keepGoing = true; }
+        // 2. Huvudloop: Fläta ihop hela krysset med korsande ord
+        for (let step = 0; step < 85; step++) {
+          let move = findBestMoveOnBoard(grid, rows, cols, dictMap, byLength, usedWords, true, 2);
+
+          // Om inga fler direkt korsande ord hittas, fyll eventuella tomma fickor med nya ord (längd >= 3)
+          if (!move) {
+            move = findBestMoveOnBoard(grid, rows, cols, dictMap, byLength, usedWords, false, 3);
+          }
+          // Sista finputsning: tillåt även 2-bokstavsord i eventuella kvarvarande luckor
+          if (!move) {
+            move = findBestMoveOnBoard(grid, rows, cols, dictMap, byLength, usedWords, false, 2);
+          }
+
+          if (!move) break;
+          applyPlacement(grid, rows, cols, move, placedWords, usedWords);
         }
 
         let letterCount = 0, clueCount = 0, themeWordCount = 0;
@@ -676,7 +786,7 @@
         }
         placedWords.forEach(pw => { if (pw.priority >= 3) themeWordCount++; });
 
-        const fitness = letterCount * 2.2 + clueCount * 1.4 + themeWordCount * 8;
+        const fitness = letterCount * 2.5 + placedWords.length * 4 + themeWordCount * 9;
         if (fitness > bestFitness) {
           bestFitness = fitness;
           bestResult = { grid, placedWords, letterCount, clueCount, themeWordCount };
@@ -731,8 +841,8 @@
 
     function getClueFontSizePt(text, isSplit) {
       const len = text.length;
-      if (isSplit) return len > 17 ? '4.7pt' : (len > 12 ? '5.2pt' : '5.7pt');
-      return len > 22 ? '5.2pt' : (len > 15 ? '5.8pt' : '6.4pt');
+      if (isSplit) return len > 17 ? '4.6pt' : (len > 12 ? '5.1pt' : '5.6pt');
+      return len > 22 ? '5.1pt' : (len > 15 ? '5.7pt' : '6.3pt');
     }
 
     function renderArrowsForLetterCell(r, c, placedWords) {
@@ -985,6 +1095,11 @@
     }
 
     function generateNewCrossword() {
+      if (!window.CROSSWORD_DATA) {
+        showToast('Kunde inte hitta korsord-ordlista.js i samma mapp!', '❌');
+        return;
+      }
+
       const btn = document.getElementById('btn-generate');
       const origHtml = btn.innerHTML;
       btn.innerHTML = `Bygger kryss...`;
