@@ -123,9 +123,9 @@ window.CROSSWORD_DATA = {
       ]
     },
 
-    snusk: {
+snusk: {
       title: 'SYNDIGA KRYSSNINGEN',
-      subtitle: 'Barnförbjudet kvällskryss (18+) • Utan filter',
+      subtitle: 'Barnförbjudet kvällskryss (18+) • Helt utan filter',
       label: '18+ Vuxet & Snuskigt',
       issueTag: 'VUXENBILAGA • NR 69',
       prizeWords: [
@@ -135,9 +135,15 @@ window.CROSSWORD_DATA = {
         'KÅTHETEN|När lustan tar över helt och hållet',
         'SYNDAREN|Den som aldrig tackar nej till en fräckis',
         'EROTIKEN|Konsten att förföra i sängkammaren',
-        'GLIDET|När allt går extra lätt och friktionsfritt'
+        'GLIDET|När allt går extra lätt och friktionsfritt',
+        'RÅKNULLET|Vild, svettig och ofiltrerad omgång i sängen',
+        'FONTÄNER|När njutningen sprutar utan hejd',
+        'DJUPHALS|När hela staken försvinner ner i svalget',
+        'BAKIFRÅN|Klassisk ställning på knä med svankad rygg',
+        'SPRÄNGKÅT|När det bultar och fuktar under kläderna'
       ],
       words: [
+        // --- Dina ursprungliga ord (den "mildare" basen) ---
         'ORGASM|Skön kulmen', 'EREKTION|Styv i brallan', 'KLITORIS|Känslig knapp',
         'GLIDMEDEL|Gör det halare', 'FÖRHUD|Dras tillbaka', 'ORALSEX|Jobb med munnen',
         'SNUSKIG|Riktigt syndig', 'TREKANT|Tre i sängen', 'FETISCH|Het böjelse',
@@ -164,9 +170,67 @@ window.CROSSWORD_DATA = {
         'SLICKA|Jobba med tunga', 'SUGEN|Kåt och redo', 'SMUTS|Snusk i tanken',
         'SYNDIG|Lagom förbjuden', 'SENSUELL|Eggande & het', 'EROTIK|Het konstform',
         'EROTISK|Väcker lusta', 'FÖRSPEL|Innan akten', 'KYSSAR|Våta med tunga',
-        'HÅLLIGÅNG|Full fart i säng'
+        'HÅLLIGÅNG|Full fart i säng',
+
+        // Anatomi, safter & könsord
+        'FITTAN|Blöta skötet', 'SLIDA|Trång tunnel', 'SPRINGA|Våt skåra',
+        'SKÅRAN|Mellan läpparna', 'BLYGD|Bar under trosan', 'BLYGDLÄPP|Ram runt springan',
+        'KLITTA|Sköna knappen', 'KLITTAN|Svullen pärla', 'GPUNKT|Dold njutpunkt',
+        'GPUNKTEN|Skönaste stället', 'FITTSAFT|Dryper av kåthet', 'SAFTIG|Plaskvåt i skötet',
+        'SLIDVÄGG|Kramar om kuken', 'SKÖTE|Fuktig famn', 'KUKHUVUD|Blankt ollon',
+        'KUKSKAFT|Ådrig stam', 'STÅKUK|Stenhård i brallan', 'SLAKKUK|Mjuk efter sats',
+        'PRAKTKUK|Grov i byxan', 'JÄTTEDASE|Tunga klubban', 'DASEN|Rejäl manslem',
+        'DASE|Grov stake', 'MANSLEM|Svullen stav', 'PUNGSÄCK|Fylld med säd',
+        'PUNGKULA|Hänger i påsen', 'PUNGKULOR|Slår mot skinkor', 'TESTIKEL|Laddar sperman',
+        'RÖVHÅL|Trånga ringen', 'RÖVHÅLET|Bakre öppningen', 'ANALRING|Sluter tätt om kuk',
+        'TVÅAN|Trånga bakhålet', 'BAKDÖRREN|Ingången där bak', 'BRÖSTVÅRTA|Styv på tutten',
+        'VÅRTGÅRD|Runt bröstknoppen', 'KÖNSHÅR|Buske vid blygd', 'BUSKEN|Ovanför springan',
+        'GLANSET|Svullet ollon', 'STRÄNGEN|Känslig under ollon', 'MELLANGÅRD|Mellan pung & röv',
+
+        // Akter, ställningar & tekniker
+        'RÅKNULLA|Köra hårt i säng', 'RÅKNULL|Vild påsättning', 'PÅSÄTTNING|Rejält skjut',
+        'SKJUTET|Hård omgång', 'PENETRERA|Tränga djupt in', 'JUCKA|Stöta med höften',
+        'STÖTA|Trycka kuken i bott', 'BOTTNA|Ända in i slidan', ' pulla|Gnida klittan våt',
+        'PULLA|Fingra skötet', 'PULLNING|Skönt fingerjobb', 'FINGRA|Leka djupt i fittan',
+        'RUNKNING|Handjobb på staken', 'AVRUNKNING|Snabb handtralla', 'HANDTRALLA|Runka av kuken',
+        'SUGJOBB|Läppar runt skaftet', 'DJUPHALS|Kuken ner i svalget', 'HALSKNULL|Djupt i munnen',
+        'RÖVSLICK|Tunga i bakre hålet', 'RIMMING|Slicka rövhålet', 'RÖVKNULL|Staken i tvåan',
+        'RÖVKNULLA|Köra i bakdörren', 'TUTTKNULL|Kuken mellan bröst', 'ANSIKTSRID|Sköte över munnen',
+        'SEXTIONIO|Suga och slicka', 'HUNDSTIL|Bakifrån på knä', 'DOGGYSTYLE|Hårt bakifrån',
+        'SKEDKNULL|Tränga in från sida', 'COWGIRL|Hon rider staken', 'DUBBELPEN|Kuk i båda hålen',
+        'DUBBELMACKA|Två stakar i en', 'FYRKANT|Fyra som knullar', 'GANGBANG|Många kukar om en',
+        'BUKKAKE|Många sprutar på en', 'GRUPPKNULL|Alla i en hög', 'GLORYHOLE|Kuk genom vägg',
+        'MORGONSEX|Stånd direkt i säng', 'MORGONSTÅND|Stenhård vid väckning', 'ENGÅNGSLIGG|Nattens ragg',
+        'HEMSLÄP|Knull efter krogen', 'KNULLKOMPIS|Vän enbart för sex',
+
+        // Utlösning, sprut & reaktioner
+        'SPRUTA|Skjuta varm sperma', 'UTLÖSNING|Skön urladdning', 'EJAKULERA|Tömma pungen',
+        'SATSEN|Kladdig laddning', 'SÄDESVÄTSKA|Vit och klibbig', 'MUNSPRUT|Sperma på tungan',
+        'SVÄLJA|Sluka hela satsen', 'SLUKA|Ta allt i munnen', 'SQUIRTA|Spruta ur skötet',
+        'FONTÄN|Våt sprutorgasm', ' serieorgasm|Komma om och om', 'SERIEORGASM|Komma flera gånger',
+        'FITTPRUTT|Luft ur slidan', 'KRAMPA|Skötet nyper åt', 'PULSERA|Dunka i staken',
+        'SVÄLLA|Växa i handen', 'STÖNA|Vråla av vällust', 'DRÄGGEL|Rinner längs skaft',
+
+        // BDSM, leksaker & fetisch
+        'BONDAGE|Bunden i sängen', 'BOLLGAG|Boll i munnen', 'MUNKAFFEL|Tystar stönen',
+        'KYSKHETSBUR|Låser in staken', 'PENISRING|Håller kuken stenhård', 'KUKRING|Stramar runt roten',
+        'ANALPLUGG|Breddar bakre hålet', 'ANALKULOR|Dras ut ur tvåan', 'DUBBELDILDO|I två fittor',
+        'LÖSFITTA|Runkrör av silikon', 'FLESHLIGHT|Knullbar attrapp', 'BRÖSTKLÄMMA|Nyper i vårtan',
+        'STEARIN|Heta droppar på hud', 'STRYPGREPP|Hand runt halsen', 'SMISKNING|Röda märken på röv',
+        'UNDERGIVEN|På knä i koppel', 'SLAVINNA|Lyder minsta vink', 'SEXSLAV|Bunden vid säng',
+        'KOPPEL|Fäst i halsbandet', 'ÖGONBINDEL|Blind i sänghalmen', 'LATEXDRÄKT|Blankt gummi på hud',
+        'GULDREGN|Varm stråle i dusch', 'FOTFETISCH|Slickar tår & sulor', 'ROLLSPEL|Snuskig fantasi',
+
+        // Tillstånd, adjektiv & korta kraftord
+        'SPRÄNGKÅT|Måste knulla nu', 'DYBLÖT|Genomvåt i trosan', 'PLASKVÅT|Drypande sköte',
+        'STENHÅRD|Spänd till bristning', 'BRUNSTIG|Vild av kättja', 'PILSK|Kåt och parningsredo',
+        'KÅTSLAG|Plötsligt ha-begär', 'KÅTBOCK|Alltid redo med bånge', 'NYMFOMAN|Omättlig i sängen',
+        'PORRSTJÄRNA|Knullar på film', 'SLAMPIG|Härligt lösaktig', 'PORRIG|Eggande och rå',
+        'SYNDERSKA|Förförisk i säng', 'SEXLEKSAK|Surrar mot klittan', 'GUMMI|Rullas på kuken',
+        'SÄD|Vit sats ur lem', 'KUK|Styv manslem', 'RÖV|Rund bak att ta', 'LIGG|Svettigt knull'
       ]
     },
+    
 
     mix: {
       title: 'SALIG BLANDNING',
